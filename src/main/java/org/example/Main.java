@@ -25,7 +25,7 @@ public class Main {
 
         EntityManagerFactory usrManagerFactory =
                 Persistence.createEntityManagerFactory(
-                        "$objectdb/db/users.odb");
+                        "objectdb/db/users.odb");
         EntityManager usrEntityManager = usrManagerFactory.createEntityManager();
 
         Usuario currentUser = null;
@@ -39,7 +39,9 @@ public class Main {
             String passwd;
             List<Usuario> usuarios = new LinkedList<>();
 
-            opcion = sc.nextInt();
+            opcion = Integer.parseInt(sc.nextLine());
+
+
             switch (opcion) {
                 case 1:
 
@@ -61,7 +63,11 @@ public class Main {
                         System.out.println("Usuario o contraseña incorrectos");
                     } else {
                         System.out.println("Logeado como: " + currentUser.getNombre() + ", Bienvenido!");
-                        currentUser.getSesiones().add(new Sesion(LocalDateTime.now()));
+                        if (currentUser.getSesiones() == null){
+                            currentUser.setSesiones(new LinkedList<>());
+                        }
+                        currentUser.getSesiones().add(new Sesion(LocalDateTime.now(), currentUser.getSesiones().size()));
+
                     }
                     break;
 
@@ -69,12 +75,14 @@ public class Main {
 
                 case 2:
 
-                    System.out.println("Ingresa el nombre del nuevo usuario");
+                    System.out.println("Ingresa el nombre del nuevo usuario" + System.lineSeparator());
+
                     usr = sc.nextLine();
+                    System.out.println(usr);
                     System.out.println("Ingresa la contraseña del nuevo usuario");
                     passwd = sc.nextLine();
                     System.out.println("Ingresa el DNI del nuevo usuario");
-                    int dni = sc.nextInt();
+                    int dni = Integer.parseInt(sc.nextLine());
                     System.out.println("Ingresa la direccion del nuevo usuario");
                     String direccion = sc.nextLine();
 
@@ -95,11 +103,22 @@ public class Main {
                     } else {
                         usrEntityManager.getTransaction().begin();
                         Usuario u = new Usuario(usuarios.size()+1, dni, passwd, usr, direccion);
-                        usrEntityManager.getTransaction().commit();
+
                         currentUser = u;
 
                         System.out.println("Logeado como: " + currentUser.getNombre() + ", Bienvenido!");
-                        currentUser.getSesiones().add(new Sesion(LocalDateTime.now()));
+                        if (currentUser.getSesiones() == null){
+                            currentUser.setSesiones(new LinkedList<>());
+                        }
+                        currentUser.getSesiones().add(new Sesion(LocalDateTime.now(), currentUser.getSesiones().size()));
+
+                        usrEntityManager.persist(u);
+                        usrEntityManager.getTransaction().commit();
+
+                        usrEntityManager.close();
+                        usrManagerFactory.close();
+
+
                     }
 
 
@@ -116,8 +135,6 @@ public class Main {
 
             }
         };
-
-
 
 
 

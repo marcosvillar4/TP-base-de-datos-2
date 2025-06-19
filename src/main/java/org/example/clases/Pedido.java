@@ -1,12 +1,27 @@
 package org.example.clases;
 
-import java.util.Date;
+import jakarta.persistence.*;
 
+import java.util.Date;
+import java.util.List;
+
+
+@Entity
 public class Pedido {
+
+    @Id
+    int id;
 
     private Date fecha;
     private int idUsuario;
+
+
+    @Transient
     private Carrito carrito;
+
+    @OneToMany
+    List<Producto> productoList;
+
 
     public Date getFecha() {
         return fecha;
@@ -30,4 +45,13 @@ public class Pedido {
     public void setCarrito(Carrito carrito) {
         this.carrito = carrito;
     }
+
+    public void cerrarCarrito(){
+        for (ItemCarrito itemCarrito : carrito.getCarrito()) {
+            for (int i = 0; i < itemCarrito.getCantidad(); i++) {
+                productoList.add(itemCarrito.getProducto());
+            }
+        }
+    }
+
 }

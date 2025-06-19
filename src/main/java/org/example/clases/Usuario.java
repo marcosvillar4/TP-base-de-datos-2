@@ -1,17 +1,34 @@
 package org.example.clases;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+
+import java.io.Serializable;
 import java.util.*;
 import java.time.LocalDate;
 
-public class Usuario {
 
+
+@Entity
+public class Usuario implements Serializable {
+
+    @Id
     private int id;
+
     private int dni;
     private String passwd;
     private String nombre;
     private String direccion;
-    private LinkedList<Pedido> pedidos;
+
+    @OneToMany
+    private List<Pedido> pedidos;
+
+    @OneToMany
     private List<Sesion> sesiones;
+
+
     private CategoriaUsuario categoria;
 
 
@@ -50,7 +67,7 @@ public class Usuario {
         this.direccion = direccion;
     }
 
-    public LinkedList<Pedido> getPedidos() {
+    public List<Pedido> getPedidos() {
         return pedidos;
     }
 
@@ -109,5 +126,13 @@ public class Usuario {
 
     public List<Sesion> getSesiones() {
         return sesiones;
+    }
+
+    public void setPedidos(List<Pedido> pedidos) {
+        this.pedidos = pedidos;
+    }
+
+    public void setSesiones(List<Sesion> sesiones) {
+        this.sesiones = sesiones;
     }
 }
