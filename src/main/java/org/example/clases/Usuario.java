@@ -4,12 +4,14 @@ import java.util.LinkedList;
 
 public class Usuario {
 
-    int id;
-    int dni;
-    String nombre;
-    String direccion;
-    LinkedList<Pedido> pedidos;
-    String categoria;
+    private int id;
+    private int dni;
+    private String passwd;
+    private String nombre;
+    private String direccion;
+    private LinkedList<Pedido> pedidos;
+    private List<Sesion> sesiones;
+    private CategoriaUsuario categoria;
 
     public Usuario(int dni, String nombre, String direccion, LinkedList<Pedido> pedidos, String categoria) {
         this.dni = dni;

@@ -4,8 +4,9 @@ import java.util.Date;
 
 public class Pedido {
 
-    Date fecha;
-    int idUsuario;
+    private Date fecha;
+    private int idUsuario;
+    private Carrito carrito;
 
     public Date getFecha() {
         return fecha;
