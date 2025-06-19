@@ -1,6 +1,7 @@
 package org.example.clases;
 
-import java.util.LinkedList;
+import java.util.*;
+import java.time.LocalDate;
 
 public class Usuario {
 
@@ -13,12 +14,13 @@ public class Usuario {
     private List<Sesion> sesiones;
     private CategoriaUsuario categoria;
 
-    public Usuario(int dni, String nombre, String direccion, LinkedList<Pedido> pedidos, String categoria) {
+
+    public Usuario(int id, int dni, String passwd, String nombre, String direccion) {
+        this.id = id;
         this.dni = dni;
+        this.passwd = passwd;
         this.nombre = nombre;
         this.direccion = direccion;
-        this.pedidos = pedidos;
-        this.categoria = categoria;
     }
 
     public Usuario() {
@@ -56,11 +58,56 @@ public class Usuario {
         this.pedidos = pedidos;
     }
 
-    public String getCategoria() {
+    public CategoriaUsuario getCategoria() {
         return categoria;
     }
 
-    public void setCategoria(String categoria) {
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setCategoria(CategoriaUsuario categoria) {
         this.categoria = categoria;
+    }
+
+    public void actualizarCategoria(){
+        Map<LocalDate, Long> minutosPorDia = new HashMap<>();
+
+        for(Sesion s : sesiones){
+            if(s.getDuracionEnMinutos() > 0){
+                LocalDate dia = s.getInicio().toLocalDate();
+                minutosPorDia.put(dia, minutosPorDia.getOrDefault(dia, 0L) + s.getDuracionEnMinutos());
+            }
+        }
+
+        //Encuentra el ultimo dia (mas reciente) en el map minutosPorDia
+        Optional<LocalDate> ultimoDia = minutosPorDia.keySet().stream().max(Comparator.naturalOrder()); //Optional porque puede que no haya fechas
+
+        if(ultimoDia.isPresent()){
+            long minutos = minutosPorDia.get(ultimoDia.get());
+            if(minutos > 240){
+                categoria = CategoriaUsuario.TOP;
+            } else if(minutos >=120){
+                categoria = CategoriaUsuario.MEDIUM;
+            } else{
+                categoria = CategoriaUsuario.LOW;
+            }
+        }
+    }
+
+    public String getPasswd() {
+        return passwd;
+    }
+
+    public void setPasswd(String passwd) {
+        this.passwd = passwd;
+    }
+
+    public List<Sesion> getSesiones() {
+        return sesiones;
     }
 }

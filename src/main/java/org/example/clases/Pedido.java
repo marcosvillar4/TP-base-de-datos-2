@@ -23,4 +23,11 @@ public class Pedido {
     public void setIdUsuario(int idUsuario) {
         this.idUsuario = idUsuario;
     }
+
+    public Carrito getCarrito() {
+        return carrito;
+    }
+    public void setCarrito(Carrito carrito) {
+        this.carrito = carrito;
+    }
 }
