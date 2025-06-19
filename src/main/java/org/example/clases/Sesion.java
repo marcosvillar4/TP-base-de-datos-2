@@ -1,15 +1,32 @@
 package org.example.clases;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+
 import java.time.LocalDateTime;
 import java.time.Duration;
 
+
+@Entity
 public class Sesion {
+
+
     private LocalDateTime inicio;
     private LocalDateTime fin;
     private Duration duracion;
 
-    public Sesion(LocalDateTime inicio) {
-       this.inicio = inicio;
+    @Id
+    private int id;
+
+    public Sesion(LocalDateTime inicio, int id) {
+        this.inicio = inicio;
+        this.fin = fin;
+
+        this.id = id;
+    }
+
+    public Sesion() {
+
     }
 
     public void cerrarSesion(){
@@ -24,4 +41,28 @@ public class Sesion {
     //Getters y setters
     public LocalDateTime getInicio() {return inicio;}
     public LocalDateTime getFin() {return fin;}
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setInicio(LocalDateTime inicio) {
+        this.inicio = inicio;
+    }
+
+    public void setFin(LocalDateTime fin) {
+        this.fin = fin;
+    }
+
+    public Duration getDuracion() {
+        return duracion;
+    }
+
+    public void setDuracion(Duration duracion) {
+        this.duracion = duracion;
+    }
 }

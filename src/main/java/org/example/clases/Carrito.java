@@ -1,8 +1,13 @@
 package org.example.clases;
 
+import jakarta.persistence.Entity;
+
 import java.util.*;
 
+
+
 public class Carrito {
+
     private LinkedList<ItemCarrito> carrito;
     private EstadoCarrito estado;
 

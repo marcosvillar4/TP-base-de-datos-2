@@ -1,9 +1,15 @@
 package org.example.clases;
 
+import jakarta.persistence.*;
+
+import java.util.Date;
+import java.util.List;
 import java.util.*;
 import java.time.*;
 import jakarta.persistence.*;
 
+
+@Entity
 @Entity
 public class Pedido {
     @Id
@@ -13,12 +19,26 @@ public class Pedido {
     @ManyToOne
     private Usuario usuario;
 
+    @Id
+    int id;
+
+    private Date fecha;
+    private int idUsuario;
+
+
+    @Transient
+    private Carrito carrito;
     private double subtotal;
     private double impuestos;
     private double total;
     private double descuentos;
     private LocalDateTime fecha;
 
+    @OneToMany
+    List<Producto> productoList;
+
+
+    public Date getFecha() {
     @OneToMany(cascade = CascadeType.ALL)
     private List<ItemPedido> items;
 
@@ -55,21 +75,23 @@ public class Pedido {
         this.subtotal = subtotal;
     }
 
-    public double getImpuestos() {
-        return impuestos;
+    public void setIdUsuario(int idUsuario) {
+        this.idUsuario = idUsuario;
     }
 
-    public void setImpuestos(double impuestos) {
-        this.impuestos = impuestos;
+    public Carrito getCarrito() {
+        return carrito;
+    }
+    public void setCarrito(Carrito carrito) {
+        this.carrito = carrito;
     }
 
-    public double getTotal() {
-        return total;
+    public void cerrarCarrito(){
+        for (ItemCarrito itemCarrito : carrito.getCarrito()) {
+            for (int i = 0; i < itemCarrito.getCantidad(); i++) {
+                productoList.add(itemCarrito.getProducto());
+            }
+        }
     }
 
-    public void setTotal(double total) {
-        this.total = total;
-    }
-    public void setDescuentos(double descuentos) {this.descuentos = descuentos;}
-    public double getDescuentos() {return descuentos;}
 }
