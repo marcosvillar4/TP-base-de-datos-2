@@ -13,7 +13,7 @@ public class Usuario {
     private LinkedList<Pedido> pedidos;
     private List<Sesion> sesiones;
     private CategoriaUsuario categoria;
-
+    private String condicionIva;
 
     public Usuario(int id, int dni, String passwd, String nombre, String direccion) {
         this.id = id;
@@ -109,5 +109,9 @@ public class Usuario {
 
     public List<Sesion> getSesiones() {
         return sesiones;
+    }
+
+    public String getCondicionIVA(){
+        return condicionIva;
     }
 }

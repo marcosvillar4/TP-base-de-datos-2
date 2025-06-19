@@ -10,6 +10,7 @@ import org.example.clases.Usuario;
 import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Scanner;
 
 public class Main {
@@ -31,6 +32,7 @@ public class Main {
         Usuario currentUser = null;
 
         while (currentUser == null) {
+            System.out.println("Bienvenido al sistema de pedidos. Elija una opción:");
             System.out.println("1. Ingresar usuario");
             System.out.println("2. Crear usuario");
             System.out.println("3. Salir");
@@ -62,6 +64,7 @@ public class Main {
                     } else {
                         System.out.println("Logeado como: " + currentUser.getNombre() + ", Bienvenido!");
                         currentUser.getSesiones().add(new Sesion(LocalDateTime.now()));
+
                     }
                     break;
 
@@ -116,6 +119,51 @@ public class Main {
 
             }
         };
+
+        if (Objects.equals(currentUser.getNombre(), "admin")){
+
+            while (opcion != 7) {
+                System.out.println("Elija una opción:");
+                System.out.println("1. Ver datos de usuario");
+                System.out.println("2. Agregar producto");
+                System.out.println("3. Eliminar producto");
+                System.out.println("4. Editar producto");
+                System.out.println("5. Ver historial de cambios de productos");
+                System.out.println("6. Ver facturas de un usuario");
+                System.out.println("7. Cerrar sesión");
+
+                opcion = sc.nextInt();
+
+                switch (opcion){
+                    case 1:
+
+                        System.out.println("Ingrese el id del usuario:");
+
+                        int idUsuario = sc.nextInt();
+                        
+                        TypedQuery<Usuario> usrFindQuery = usrEntityManager.createQuery("SELECT u FROM Usuario u WHERE u.id =:idUsuario", Usuario.class);
+                        List<Usuario> usuarios = usrFindQuery.setParameter("idUsuario",idUsuario).getResultList();
+
+                        if (usuarios != null){
+                            for (Usuario usuario : usuarios) {
+                                System.out.println("ID del usuario: " + usuario.getId() + ".");
+                                System.out.println("Nombre del usuario: " + usuario.getNombre() + ".");
+                                System.out.println("Clave del usuario: " + usuario.getPasswd() + ".");
+                                System.out.println("DNI del usuario: " + usuario.getDni() + ".");
+                                System.out.println("Dirección del usuario: " + usuario.getDireccion() + ".");
+                                System.out.println("Tipo de usuario: " + usuario.getCategoria() + ".");
+                            }
+                        } else {
+                            System.out.println("ID de usuario no encontrado.");
+                        }
+                        
+                        break;
+
+                    case 2:
+
+                }
+            }
+        }
 
 
 
