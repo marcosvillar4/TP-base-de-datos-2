@@ -41,5 +41,5 @@ public class Pago {
     public List<Factura> getFacturasAplicadas() {return facturasAplicadas;}
     public void setFacturasAplicadas(List<Factura> facturasAplicadas) { this.facturasAplicadas = facturasAplicadas; }
     public void setOperador(String operador) {this.operador=operador;}
-    private String getOperador() {return operador;}
+    public String getOperador() {return operador;}
 }

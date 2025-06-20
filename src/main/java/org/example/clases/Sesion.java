@@ -20,8 +20,6 @@ public class Sesion {
 
     public Sesion(LocalDateTime inicio, int id) {
         this.inicio = inicio;
-        this.fin = fin;
-
         this.id = id;
     }
 

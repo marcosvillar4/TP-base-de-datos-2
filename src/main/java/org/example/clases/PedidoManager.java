@@ -3,6 +3,8 @@ package org.example.clases;
 import org.example.clases.*;
 
 import jakarta.persistence.EntityManager;
+
+import java.sql.SQLOutput;
 import java.time.LocalDateTime;
 import java.util.*;
 public class PedidoManager {
@@ -99,5 +101,37 @@ public class PedidoManager {
 
         Factura factura = facturarPedido(pedido);
         registrarPago(factura, medioPago, operador);
+    }
+
+    public void listarPagos(Usuario usuario){
+        String jpql = """
+            SELECT DISTINCT pago FROM Pago pago
+            JOIN pago.facturasAplicadas factura
+            JOIN factura.pedido pedido
+            WHERE pedido.usuario = :usuario
+        """;
+
+        List<Pago> pagos = em.createQuery(jpql, Pago.class).setParameter("usuario", usuario).getResultList();
+
+        if(pagos.isEmpty()){
+            System.out.println("El usuario no tiene pagos registrados");
+            return;
+        }
+
+        System.out.println("PAGOS REGISTRADOS DE: " + usuario.getNombre());
+        System.out.println("DNI:" + usuario.getDni());
+        for (Pago pago : pagos) {
+            System.out.println("---------------------");
+            System.out.println("ID PAGO: " + pago.getId());
+            System.out.println("Fecha: " + pago.getFecha());
+            System.out.println("Monto: $" + pago.getMonto());
+            System.out.println("Medio: " + pago.getMedioPago());
+            System.out.println("Operador: " + (pago.getOperador() != null ? pago.getOperador() : "N/A"));
+            System.out.print("Facturas asociadas (IDs): ");
+            for (Factura f : pago.getFacturasAplicadas()) {
+                System.out.print(f.getId() + " ");
+            }
+            System.out.println();
+        }
     }
 }
