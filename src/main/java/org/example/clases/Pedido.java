@@ -30,6 +30,13 @@ public class Pedido {
     List<Producto> productoList;
 
     private void cerrarCarrito(){
+        //Inicializar si todavia productoList no esta creado
+        if(productoList == null){
+            productoList = new ArrayList<>();
+        }
+
+        //Vacia la lista antes de volver a llenarla
+        productoList.clear();
         for (ItemCarrito itemCarrito : carrito.getCarrito()) {
             for (int i = 0; i < itemCarrito.getCantidad(); i++) {
                 productoList.add(itemCarrito.getProducto());
