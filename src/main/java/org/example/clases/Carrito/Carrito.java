@@ -31,7 +31,7 @@ public class Carrito {
 
     public void agregarItem(Producto producto, int cantidad) {
         for(ItemCarrito item : carrito){
-            if(item.getProducto().getIdProducto() == producto.getIdProducto()){
+            if(item.getProducto().getId().equals(producto.getId())){
                 item.setCantidad(item.getCantidad() + cantidad);
                 return;
             }
@@ -42,13 +42,13 @@ public class Carrito {
         carrito.add(nuevo);
     }
 
-    public void eliminarItem(int idProducto){
-        carrito.removeIf(item -> item.getProducto().getIdProducto() == idProducto);
+    public void eliminarItem(String idProducto){
+        carrito.removeIf(item -> item.getProducto().getId().equals(idProducto));
     }
 
-    public void modificarCantidad(int idProducto, int cantidad){
+    public void modificarCantidad(String idProducto, int cantidad){
         for(ItemCarrito item : carrito){
-            if(item.getProducto().getIdProducto() == idProducto){
+            if(item.getProducto().getId().equals(idProducto) ){
                 item.setCantidad(cantidad);
                 return;
             }

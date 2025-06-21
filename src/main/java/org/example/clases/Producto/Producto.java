@@ -1,42 +1,77 @@
 package org.example.clases.Producto;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import java.util.*;
 
-@Entity
 public class Producto {
+    private String id;
+    private String nombre;
+    private String descripcion;
+    private double precio;
+    private int cantidad;
+    private List<String> comentarios;
+    private List<CambioProducto> historialCambios;
 
-    @Id
-    private int idProducto;
-    private String nombreProducto;
-    private String descripcionProducto;
-    private String comentariosProducto;
-    private double precioActual;
+    public Producto(String id, String nombre, String descripcion, double precio, int cantidad) {
+        this.id = id;
+        this.nombre = nombre;
+        this.descripcion = descripcion;
+        this.precio = precio;
+        this.cantidad = cantidad;
+    }
 
-    public String getNombreProducto() {
-        return nombreProducto;
+    public String getId() {
+        return id;
     }
-    public void setNombreProducto(String nombreProducto) {
-        this.nombreProducto = nombreProducto;
+
+    public void setId(String id) {
+        this.id = id;
     }
-    public String getDescripcionProducto() {
-        return descripcionProducto;
+
+    public String getNombre() {
+        return nombre;
     }
-    public void setDescripcionProducto(String descripcionProducto) {
-        this.descripcionProducto = descripcionProducto;
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
     }
-    public String getComentariosProducto() {
-        return comentariosProducto;
+
+    public String getDescripcion() {
+        return descripcion;
     }
-    public void setComentariosProducto(String comentariosProducto) {
-        this.comentariosProducto = comentariosProducto;
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
     }
-    public int getIdProducto() {
-        return idProducto;
+
+    public double getPrecio() {
+        return precio;
     }
-    public void setIdProducto(int idProducto) {
-        this.idProducto = idProducto;
+
+    public void setPrecio(double precio) {
+        this.precio = precio;
     }
-    public void setPrecioActual(double precioActual) {this.precioActual = precioActual;}
-    public double getPrecioActual() {return precioActual;}
+
+    public int getCantidad() {
+        return cantidad;
+    }
+
+    public void setCantidad(int cantidad) {
+        this.cantidad = cantidad;
+    }
+
+    public List<String> getComentarios() {
+        return comentarios;
+    }
+
+    public void setComentarios(List<String> comentarios) {
+        this.comentarios = comentarios;
+    }
+
+    public List<CambioProducto> getHistorialCambios() {
+        return historialCambios;
+    }
+
+    public void setHistorialCambios(List<CambioProducto> historialCambios) {
+        this.historialCambios = historialCambios;
+    }
 }

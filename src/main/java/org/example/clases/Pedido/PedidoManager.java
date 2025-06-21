@@ -55,6 +55,7 @@ public class PedidoManager {
 
     // Listado de pagos realizados por un usuario
     public void listarPagos(int idUsuario) {
+
         String jpql = """
                 SELECT DISTINCT p FROM Pago p
                 JOIN p.facturasAplicadas f
@@ -72,8 +73,8 @@ public class PedidoManager {
         }
 
         Usuario usuario = em.find(Usuario.class, idUsuario);
-        System.out.println("PAGOS DE: " + (usuario != null ? usuario.getNombre() : "Usuario no encontrado"));
-        System.out.println("DNI: " + (usuario != null ? usuario.getDni() : "N/A"));
+        System.out.println("PAGOS DE: " + usuario.getNombre());
+        System.out.println("DNI: " + usuario.getDni());
 
         for (Pago pago : pagos) {
             System.out.println("---------------------");
@@ -105,8 +106,8 @@ public class PedidoManager {
         }
 
         Usuario usuario = em.find(Usuario.class, idUsuario);
-        System.out.println("FACTURAS DE: " + (usuario != null ? usuario.getNombre() : "Usuario no encontrado"));
-        System.out.println("DNI: " + (usuario != null ? usuario.getDni() : "N/A"));
+        System.out.println("FACTURAS DE: " + "Usuario no encontrado");
+        System.out.println("DNI: " +  usuario.getDni());
 
         for (Factura f : facturas) {
             System.out.println("---------------------");
@@ -134,10 +135,10 @@ public class PedidoManager {
         pedido.setFecha(LocalDateTime.now());
 
         double subtotal = carrito.getCarrito().stream()
-                .mapToDouble(item -> item.getProducto().getPrecioActual() * item.getCantidad())
+                .mapToDouble(item -> item.getProducto().getPrecio() * item.getCantidad())
                 .sum();
 
-        double impuestos = subtotal * 0.21;
+        double impuestos = subtotal * 0.21; //IVA
         double total = subtotal + impuestos;
 
         pedido.setSubtotal(subtotal);

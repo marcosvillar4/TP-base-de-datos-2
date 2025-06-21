@@ -2,9 +2,10 @@ package org.example.clases.Mongo;
 
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.result.DeleteResult;
 import org.bson.Document;
 import org.bson.types.ObjectId;
-import org.example.clases.Producto.ProductoCatalogo;
+import org.example.clases.Producto.Producto;
 
 import java.util.*;
 import java.time.*;
@@ -12,12 +13,15 @@ import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.*;
 public class ProductoCatalogoDAO {
     private final MongoCollection<Document> coleccion;
+    private final HistorialCambiosService historialService;
 
     public ProductoCatalogoDAO(MongoDatabase db) {
         this.coleccion = db.getCollection("productos");
+        this.historialService = new HistorialCambiosService(coleccion);
     }
 
-    public void insertarProducto(ProductoCatalogo prod) {
+    //Inserta el producto en la base
+    public void insertarProducto(Producto prod) {
         Document doc = new Document("nombre", prod.getNombre())
                 .append("precio", prod.getPrecio())
                 .append("cantidad", prod.getCantidad())
@@ -27,10 +31,11 @@ public class ProductoCatalogoDAO {
         coleccion.insertOne(doc);
     }
 
-    public List<Document> getAll(){
+    public ArrayList<Document> getAll(){
         return coleccion.find().into(new ArrayList<>());
     }
 
+    //Actualiza el precio de un producto en base a su id y almacena el cambio en el historial
     public void actualizarPrecio(String id, double nuevoPrecio, String operador){
         Document prod = coleccion.find(eq("_id",  new ObjectId(id))).first();
 
@@ -47,7 +52,13 @@ public class ProductoCatalogoDAO {
                                 .append("fecha", LocalDateTime.now().toString()))));
     }
 
+    //Elimina el producto de la base
     public void eliminarProducto(String idProductoEliminar) {
-        coleccion.deleteOne(eq("_id", new ObjectId(idProductoEliminar)));
+        DeleteResult check = coleccion.deleteOne(eq("_id", new ObjectId(idProductoEliminar)));
+        if (check.getDeletedCount() == 0){
+            System.out.println("No existe el id ingresado.");
+        }else {
+            System.out.println("Producto eliminado.");
+        }
     }
 }

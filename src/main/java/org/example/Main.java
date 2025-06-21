@@ -5,14 +5,16 @@ import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import jakarta.persistence.TypedQuery;
 import org.example.clases.Carrito.CarritoManager;
+import org.example.clases.Mongo.MongoManager;
+import org.example.clases.Mongo.ProductoCatalogoDAO;
 import org.example.clases.Pedido.PedidoManager;
+import org.example.clases.Producto.Producto;
 import org.example.clases.Usuario.*;
 
 import java.time.LocalDateTime;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Scanner;
+import java.util.*;
+
+import org.bson.Document;
 
 public class Main {
     public static void main(String[] args) {
@@ -159,10 +161,10 @@ public class Main {
                         int idUsuarioBuscar = sc.nextInt();
 
                         TypedQuery<Usuario> usrFindQuery = usrEntityManager.createQuery("SELECT u FROM Usuario u WHERE u.id =:idUsuario", Usuario.class);
-                        List<Usuario> usuarios = usrFindQuery.setParameter("idUsuario",idUsuarioBuscar).getResultList();
+                        List<Usuario> usuarioBuscar = usrFindQuery.setParameter("idUsuario",idUsuarioBuscar).getResultList();
 
-                        if (!usuarios.isEmpty()){
-                            for (Usuario usuario : usuarios) {
+                        if (!usuarioBuscar.isEmpty()){
+                            for (Usuario usuario : usuarioBuscar) {
                                 System.out.println("ID del usuario: " + usuario.getId() + ".");
                                 System.out.println("Nombre del usuario: " + usuario.getNombre() + ".");
                                 System.out.println("Clave del usuario: " + usuario.getPasswd() + ".");
@@ -177,6 +179,11 @@ public class Main {
                         break;
 
                     case 2:
+
+                        ProductoCatalogoDAO productoCatalogoDAO = new ProductoCatalogoDAO(MongoManager.getDatabase());
+
+                        productoCatalogoDAO.insertarProducto(new Producto("10", "Producto 1", "AAAAAAAAA", 20, 10));
+
 
                         break;
 
@@ -196,12 +203,21 @@ public class Main {
 
 
 
+
+
                     case 6:
                         System.out.println("Ingrese el ID del usuario:");
 
                         int idUsuarioFacturas = sc.nextInt();
 
-                        pedidoManager.listarFacturas(idUsuarioFacturas);
+                        TypedQuery<Usuario> usrFindQuery2 = usrEntityManager.createQuery("SELECT u FROM Usuario u WHERE u.id =:idUsuario", Usuario.class);
+                        List<Usuario> usuarioFactura = usrFindQuery2.setParameter("idUsuario",idUsuarioFacturas).getResultList();
+
+                        if (!usuarioFactura.isEmpty()){
+                            pedidoManager.listarFacturas(idUsuarioFacturas);
+                        } else {
+                            System.out.println("ID del usuario no encontrado.");
+                        }
 
                         break;
 
@@ -214,6 +230,38 @@ public class Main {
                         break;
                 }
             }
+        } else {
+
+            while (opcion != 6){
+                System.out.println("Elija una opcion:");
+                System.out.println("__________________");
+                System.out.println("1. Ver catálogo de productos");
+                System.out.println("2. Agregar item al carrito");
+                System.out.println("3. Eliminar item del carrito");
+                System.out.println("3. Ver carrito");
+                System.out.println("4. Confirmar y pagar pedido");
+                System.out.println("5. Salir");
+
+                opcion = Integer.parseInt(sc.nextLine());
+
+                switch (opcion){
+                    case 1:
+
+
+                        ProductoCatalogoDAO productoCatalogoDAO = new ProductoCatalogoDAO(MongoManager.getDatabase());
+                        ArrayList<Document> documentList = productoCatalogoDAO.getAll();
+
+                        ArrayList<Producto> listaProductos = new ArrayList<>();
+
+                        for (Document document : documentList) {
+                            System.out.println(document.get("nombre"));
+                        }
+                        break;
+
+                    case 2:
+                }
+            }
+
         }
 
 
