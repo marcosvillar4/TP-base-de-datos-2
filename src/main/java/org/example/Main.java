@@ -7,6 +7,7 @@ import jakarta.persistence.TypedQuery;
 import org.example.clases.Carrito.CarritoManager;
 import org.example.clases.Mongo.MongoManager;
 import org.example.clases.Mongo.ProductoCatalogoDAO;
+import org.example.clases.Mongo.ProductoCatalogoService;
 import org.example.clases.Pedido.PedidoManager;
 import org.example.clases.Producto.Producto;
 import org.example.clases.Usuario.*;
@@ -31,6 +32,10 @@ public class Main {
 
         CarritoManager carritoManager = new CarritoManager();
         PedidoManager pedidoManager = new PedidoManager(usrEntityManager, carritoManager);
+
+        ProductoCatalogoDAO productoCatalogoDAO = new ProductoCatalogoDAO(MongoManager.getDatabase());
+
+        ProductoCatalogoService productoCatalogoService = new ProductoCatalogoService(MongoManager.getDatabase().getCollection("productos"));
 
         while (currentUser == null) {
             System.out.println("Bienvenido al sistema de pedidos. Elija una opción:");
@@ -141,7 +146,7 @@ public class Main {
 
         if (Objects.equals(currentUser.getNombre(), "admin")){
 
-            while (opcion != 7) {
+            while (opcion != 8) {
                 System.out.println("Elija una opción:");
                 System.out.println("1. Ver datos de usuario");
                 System.out.println("2. Agregar producto");
@@ -149,9 +154,10 @@ public class Main {
                 System.out.println("4. Editar producto");
                 System.out.println("5. Ver historial de cambios de productos");
                 System.out.println("6. Ver facturas de un usuario");
-                System.out.println("7. Cerrar sesión");
+                System.out.println("7. Ver catálogo de productos");
+                System.out.println("8. Cerrar sesión");
 
-                opcion = sc.nextInt();
+                opcion = Integer.parseInt(sc.nextLine());
 
                 switch (opcion){
                     case 1:
@@ -180,9 +186,18 @@ public class Main {
 
                     case 2:
 
-                        ProductoCatalogoDAO productoCatalogoDAO = new ProductoCatalogoDAO(MongoManager.getDatabase());
+                        System.out.println("Nombre del Producto: ");
+                        String nombre = sc.nextLine();
+                        System.out.println("Descripcion del Producto: ");
+                        String descripcion = sc.nextLine();
+                        System.out.println("Precio del Producto: ");
+                        int precio = sc.nextInt();
+                        System.out.println("Cantidad del Producto: ");
+                        int cantidad = sc.nextInt();
 
-                        productoCatalogoDAO.insertarProducto(new Producto("10", "Producto 1", "AAAAAAAAA", 20, 10));
+                        Producto producto = new Producto(nombre, descripcion, precio, cantidad);
+                        productoCatalogoDAO.insertarProducto(producto);
+
 
 
                         break;
@@ -191,7 +206,7 @@ public class Main {
 
                         System.out.println("Ingresa el ID del producto a eliminar:");
 
-                        int idProducto = sc.nextInt();
+                        String idProductoEliminar  = sc.nextLine();
 
                         break;
 
@@ -199,10 +214,54 @@ public class Main {
 
                         System.out.println("Ingresa el ID del producto a editar:");
 
-                        int idProductoEditar =  sc.nextInt();
+                        String idProductoEditar =  sc.nextLine();
 
+                        if (productoCatalogoDAO.encontrarProducto(idProductoEditar)){
+                            System.out.println("Elige el campo a editar:");
+                            System.out.println("1. Editar el nombre");
+                            System.out.println("2. Editar la descripción");
+                            System.out.println("3. Editar el precio");
+                            System.out.println("4. Editar la foto/video");
+                            System.out.println("5. Editar el comentario");
+                            
+                            int opcionEditar = sc.nextInt();
 
+                            switch (opcionEditar){
+                                case 1:
+                                    System.out.println("Ingrese el nuevo nombre del producto:");
+                                    String nuevoNombre = sc.nextLine();
+                                    productoCatalogoService.actualizarNombre(idProductoEditar, nuevoNombre, currentUser.getNombre());
+                                    break;
 
+                                case 2:
+                                    System.out.println("Ingrese la nueva descripcion del producto:");
+                                    String nuevaDescripcion = sc.nextLine();
+                                    productoCatalogoService.actualizarDescripcion(idProductoEditar, nuevaDescripcion, currentUser.getNombre());
+                                    break;
+
+                                case 3:
+                                    System.out.println("Ingrese el nuevo precio del producto:");
+                                    double nuevoPrecio = sc.nextDouble();
+                                    productoCatalogoService.actualizarPrecio(idProductoEditar, nuevoPrecio, currentUser.getNombre());
+                                    break;
+
+                                case 4:
+                                    System.out.println("Ingrese el URL de la nueva foto/video del producto:");
+                                    String nuevoURL = sc.nextLine();
+                                    productoCatalogoService.actualizarFoto(idProductoEditar, nuevoURL, currentUser.getNombre());
+                                    break;
+
+                                case 5:
+                                    System.out.println("Ingrese el nuevo comentario del producto:");
+                                    String nuevoComentario = sc.nextLine();
+                                    productoCatalogoService.actualizarComentarios(idProductoEditar, nuevoComentario, currentUser.getNombre());
+                                    break;
+
+                                default:
+                                    System.out.println("El número ingresado no es válido.");
+                                    break;
+                            }
+                        }
 
 
                     case 6:
@@ -221,7 +280,7 @@ public class Main {
 
                         break;
 
-                    case 7:
+                    case 8:
 
                         System.out.println("Cerrando sesión...");
 
@@ -232,7 +291,10 @@ public class Main {
             }
         } else {
 
-            while (opcion != 6){
+            int opcion2 = 0;
+            while (opcion2 != 6){
+
+
                 System.out.println("Elija una opcion:");
                 System.out.println("__________________");
                 System.out.println("1. Ver catálogo de productos");
@@ -242,19 +304,23 @@ public class Main {
                 System.out.println("4. Confirmar y pagar pedido");
                 System.out.println("5. Salir");
 
-                opcion = Integer.parseInt(sc.nextLine());
+                opcion2 = sc.nextInt();
 
-                switch (opcion){
+                switch (opcion2){
                     case 1:
 
-
-                        ProductoCatalogoDAO productoCatalogoDAO = new ProductoCatalogoDAO(MongoManager.getDatabase());
                         ArrayList<Document> documentList = productoCatalogoDAO.getAll();
 
-                        ArrayList<Producto> listaProductos = new ArrayList<>();
+
 
                         for (Document document : documentList) {
-                            System.out.println(document.get("nombre"));
+
+                            System.out.println("_______________________________________");
+                            System.out.println("ID: " + document.get("_id").toString());
+                            System.out.println("Nombre: " + document.get("nombre").toString());
+                            //System.out.println("Descripcion: " + document.get("descripcion").toString());
+                            System.out.println("Precio: " + document.get("precio"));
+                            System.out.println("Stock: " + document.get("cantidad"));
                         }
                         break;
 

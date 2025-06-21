@@ -11,8 +11,7 @@ public class Producto {
     private List<String> comentarios;
     private List<CambioProducto> historialCambios;
 
-    public Producto(String id, String nombre, String descripcion, double precio, int cantidad) {
-        this.id = id;
+    public Producto(String nombre, String descripcion, double precio, int cantidad) {
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.precio = precio;

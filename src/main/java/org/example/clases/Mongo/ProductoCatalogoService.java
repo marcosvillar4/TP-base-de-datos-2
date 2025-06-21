@@ -32,6 +32,27 @@ public class ProductoCatalogoService {
             actualizarCampo(id, "nombre", nuevoNombre, viejo, operador);
         }
 
+        public void actualizarDescripcion(String id, String nuevaDescripcion, String operador) {
+            Document prod = getProducto(id);
+            if (prod == null || nuevaDescripcion == null || nuevaDescripcion.isBlank()) return;
+            String viejo = prod.getString("descripcion");
+            actualizarCampo(id, "descripcion", nuevaDescripcion, viejo, operador);
+        }
+
+        public void actualizarFoto(String id, String nuevaFoto, String operador) {
+            Document prod = getProducto(id);
+            if(prod == null || nuevaFoto == null || nuevaFoto.isBlank()) return;
+            String viejo = prod.getString("foto");
+            actualizarCampo(id, "foto", nuevaFoto, viejo, operador);
+        }
+
+        public void actualizarComentarios(String id, String nuevoComentario, String operador){
+            Document prod = getProducto(id);
+            if(prod == null || nuevoComentario == null || nuevoComentario.isBlank()) return;
+            String viejo = prod.getString("comentario");
+            actualizarCampo(id, "comentario", nuevoComentario, viejo, operador);
+        }
+
         private void actualizarCampo(String id, String campo, Object nuevoValor, Object valorAnterior, String operador) {
             coleccion.updateOne(eq("_id", new ObjectId(id)), set(campo, nuevoValor));
             historial.registrarCambio(id, campo, valorAnterior, nuevoValor, operador);

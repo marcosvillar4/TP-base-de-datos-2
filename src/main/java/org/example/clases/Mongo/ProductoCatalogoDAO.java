@@ -23,6 +23,7 @@ public class ProductoCatalogoDAO {
     //Inserta el producto en la base
     public void insertarProducto(Producto prod) {
         Document doc = new Document("nombre", prod.getNombre())
+                .append("descripcion", prod.getDescripcion())
                 .append("precio", prod.getPrecio())
                 .append("cantidad", prod.getCantidad())
                 .append("comentarios", prod.getComentarios())
@@ -60,5 +61,9 @@ public class ProductoCatalogoDAO {
         }else {
             System.out.println("Producto eliminado.");
         }
+    }
+
+    public boolean encontrarProducto(String idProductoBuscar) {
+        return coleccion.find(eq("_id", new ObjectId(idProductoBuscar))).first() != null;
     }
 }
