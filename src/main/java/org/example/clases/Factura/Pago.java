@@ -1,8 +1,9 @@
-package org.example.clases;
+package org.example.clases.Factura;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import jakarta.persistence.*;
+import org.example.clases.Enums.MedioPago;
 
 @Entity
 public class Pago {

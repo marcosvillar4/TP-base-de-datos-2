@@ -1,6 +1,7 @@
-package org.example.clases;
+package org.example.clases.Carrito;
 
-import jakarta.persistence.Entity;
+import org.example.clases.Enums.EstadoCarrito;
+import org.example.clases.Producto.Producto;
 
 import java.util.*;
 

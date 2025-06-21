@@ -1,4 +1,4 @@
-package org.example.clases;
+package org.example.clases.Enums;
 
 public enum EstadoCarrito {
     PENDIENTE,

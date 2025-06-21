@@ -1,7 +1,9 @@
-package org.example.clases;
+package org.example.clases.Factura;
 
 import java.util.*;
 import jakarta.persistence.*;
+import org.example.clases.Enums.EstadoFactura;
+import org.example.clases.Pedido.Pedido;
 
 @Entity
 public class Factura {

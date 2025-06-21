@@ -1,4 +1,4 @@
-package org.example.clases;
+package org.example.clases.Carrito;
 
 import com.google.gson.Gson;
 import redis.clients.jedis.Jedis;

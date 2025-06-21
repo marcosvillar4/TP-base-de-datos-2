@@ -1,12 +1,15 @@
-package org.example.clases;
+package org.example.clases.Pedido;
 
 import jakarta.persistence.*;
 
-import java.util.Date;
 import java.util.List;
 import java.util.*;
 import java.time.*;
-import jakarta.persistence.*;
+
+import org.example.clases.Carrito.Carrito;
+import org.example.clases.Carrito.ItemCarrito;
+import org.example.clases.Producto.Producto;
+import org.example.clases.Usuario.Usuario;
 
 @Entity
 public class Pedido {
@@ -26,8 +29,7 @@ public class Pedido {
     private double descuentos;
     private LocalDateTime fecha;
 
-    @OneToMany
-    List<Producto> productoList;
+    List<Integer> productoList;
 
     private void cerrarCarrito(){
         //Inicializar si todavia productoList no esta creado
@@ -39,7 +41,7 @@ public class Pedido {
         productoList.clear();
         for (ItemCarrito itemCarrito : carrito.getCarrito()) {
             for (int i = 0; i < itemCarrito.getCantidad(); i++) {
-                productoList.add(itemCarrito.getProducto());
+                productoList.add(itemCarrito.getProducto().getIdProducto());
             }
         }
     }
@@ -89,7 +91,7 @@ public class Pedido {
         this.carrito = carrito;
     }
 
-    public List<Producto> getProductoList() {
+    public List<Integer> getProductoList() {
         cerrarCarrito();
         return productoList;
     }

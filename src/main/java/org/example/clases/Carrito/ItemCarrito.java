@@ -1,5 +1,7 @@
-package org.example.clases;
+package org.example.clases.Carrito;
 
+
+import org.example.clases.Producto.Producto;
 
 public class ItemCarrito {
     int id;

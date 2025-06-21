@@ -1,6 +1,13 @@
-package org.example.clases;
+package org.example.clases.Pedido;
 
 import jakarta.persistence.EntityManager;
+import org.example.clases.Carrito.Carrito;
+import org.example.clases.Carrito.CarritoManager;
+import org.example.clases.Enums.EstadoFactura;
+import org.example.clases.Enums.MedioPago;
+import org.example.clases.Factura.Factura;
+import org.example.clases.Factura.Pago;
+import org.example.clases.Usuario.Usuario;
 
 import java.time.LocalDateTime;
 import java.util.*;

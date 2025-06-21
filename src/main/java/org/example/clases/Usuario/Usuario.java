@@ -1,8 +1,10 @@
-package org.example.clases;
+package org.example.clases.Usuario;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import org.example.clases.Enums.CategoriaUsuario;
+import org.example.clases.Pedido.Pedido;
 
 import java.io.Serializable;
 import java.util.*;

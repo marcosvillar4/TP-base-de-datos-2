@@ -4,7 +4,9 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import jakarta.persistence.TypedQuery;
-import org.example.clases.*;
+import org.example.clases.Carrito.CarritoManager;
+import org.example.clases.Pedido.PedidoManager;
+import org.example.clases.Usuario.*;
 
 import java.time.LocalDateTime;
 import java.util.LinkedList;
