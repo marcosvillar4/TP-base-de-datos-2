@@ -1,12 +1,10 @@
 package org.example.clases;
 
-import org.example.clases.*;
-
 import jakarta.persistence.EntityManager;
 
-import java.sql.SQLOutput;
 import java.time.LocalDateTime;
 import java.util.*;
+
 public class PedidoManager {
     private final EntityManager em;
     private final CarritoManager carritoManager;
@@ -16,7 +14,140 @@ public class PedidoManager {
         this.carritoManager = carritoManager;
     }
 
-    public Factura facturarPedido(Pedido pedido){
+
+    // Cierra el proceso de compra: genera pedido, factura y registra el pago (incluyendo otras facturas)
+    public void cerrarPedidoYRegistrarPago(int idUsuario, Usuario usuario, MedioPago medioPago, String operador) {
+        Pedido pedido = generarYGuardarPedido(idUsuario, usuario);
+        if (pedido == null) {
+            System.out.println("No se generó el pedido");
+            return;
+        }
+
+        Factura facturaNueva = facturarPedido(pedido);
+        List<Factura> facturasSeleccionadas = obtenerFacturasSeleccionadas(idUsuario);
+        List<Factura> todas = new ArrayList<>();
+        todas.add(facturaNueva);
+        todas.addAll(facturasSeleccionadas);
+
+        registrarPago(todas, medioPago, operador);
+        System.out.println("Pago registrado con éxito.");
+    }
+
+    // Lista facturas pendientes del usuario
+    public List<Factura> buscarFacturasPendientes(int idUsuario) {
+        String jpql = """
+                SELECT f FROM Factura f
+                WHERE f.pedido.usuario.id = :idUsuario AND f.estado = :estado
+                """;
+
+        return em.createQuery(jpql, Factura.class)
+                .setParameter("idUsuario", idUsuario)
+                .setParameter("estado", EstadoFactura.PENDIENTE)
+                .getResultList();
+    }
+
+    // Listado de pagos realizados por un usuario
+    public void listarPagos(int idUsuario) {
+        String jpql = """
+                SELECT DISTINCT p FROM Pago p
+                JOIN p.facturasAplicadas f
+                JOIN f.pedido ped
+                WHERE ped.usuario.id = :idUsuario
+                """;
+
+        List<Pago> pagos = em.createQuery(jpql, Pago.class)
+                .setParameter("idUsuario", idUsuario)
+                .getResultList();
+
+        if (pagos.isEmpty()) {
+            System.out.println("El usuario con ID " + idUsuario + " no tiene pagos registrados.");
+            return;
+        }
+
+        Usuario usuario = em.find(Usuario.class, idUsuario);
+        System.out.println("PAGOS DE: " + (usuario != null ? usuario.getNombre() : "Usuario no encontrado"));
+        System.out.println("DNI: " + (usuario != null ? usuario.getDni() : "N/A"));
+
+        for (Pago pago : pagos) {
+            System.out.println("---------------------");
+            System.out.println("ID PAGO: " + pago.getId());
+            System.out.println("Fecha: " + pago.getFecha());
+            System.out.println("Monto: $" + pago.getMonto());
+            System.out.println("Medio: " + pago.getMedioPago());
+            System.out.println("Operador: " + (pago.getOperador() != null ? pago.getOperador() : "N/A"));
+            System.out.print("Facturas asociadas (IDs): ");
+            pago.getFacturasAplicadas().forEach(f -> System.out.print(f.getId() + " "));
+            System.out.println();
+        }
+    }
+
+    // Listado completo de facturas del usuario
+    public void listarFacturas(int idUsuario) {
+        String jpql = """
+                SELECT f FROM Factura f
+                WHERE f.pedido.usuario.id = :idUsuario
+                """;
+
+        List<Factura> facturas = em.createQuery(jpql, Factura.class)
+                .setParameter("idUsuario", idUsuario)
+                .getResultList();
+
+        if (facturas.isEmpty()) {
+            System.out.println("El usuario con ID " + idUsuario + " no tiene facturas.");
+            return;
+        }
+
+        Usuario usuario = em.find(Usuario.class, idUsuario);
+        System.out.println("FACTURAS DE: " + (usuario != null ? usuario.getNombre() : "Usuario no encontrado"));
+        System.out.println("DNI: " + (usuario != null ? usuario.getDni() : "N/A"));
+
+        for (Factura f : facturas) {
+            System.out.println("---------------------");
+            System.out.println("ID FACTURA: " + f.getId());
+            System.out.println("Fecha: " + f.getPedido().getFecha());
+            System.out.println("Subtotal: $" + f.getSubtotal());
+            System.out.println("Impuestos: $" + f.getImpuestos());
+            System.out.println("Total: $" + f.getTotal());
+            System.out.println("Estado: " + f.getEstado());
+            System.out.println("ID Pedido origen: " + f.getPedido().getIdPedido());
+        }
+    }
+
+    // Genera un pedido a partir del carrito del usuario y lo persiste
+    private Pedido generarYGuardarPedido(int idUsuario, Usuario usuario) {
+        Carrito carrito = carritoManager.obtenerCarrito(idUsuario);
+        if (carrito == null || carrito.getCarrito().isEmpty()) {
+            System.out.println("Carrito vacío. No se puede generar pedido.");
+            return null;
+        }
+
+        Pedido pedido = new Pedido();
+        pedido.setUsuario(usuario);
+        pedido.setCarrito(carrito);
+        pedido.setFecha(LocalDateTime.now());
+
+        double subtotal = carrito.getCarrito().stream()
+                .mapToDouble(item -> item.getProducto().getPrecioActual() * item.getCantidad())
+                .sum();
+
+        double impuestos = subtotal * 0.21;
+        double total = subtotal + impuestos;
+
+        pedido.setSubtotal(subtotal);
+        pedido.setImpuestos(impuestos);
+        pedido.setTotal(total);
+
+        pedido.getProductoList();
+
+        em.getTransaction().begin();
+        em.persist(pedido);
+        em.getTransaction().commit();
+
+        return pedido;
+    }
+
+    // Genera y persiste una factura para un pedido
+    private Factura facturarPedido(Pedido pedido) {
         Factura factura = new Factura();
         factura.setPedido(pedido);
         factura.setSubtotal(pedido.getSubtotal());
@@ -32,106 +163,58 @@ public class PedidoManager {
         return factura;
     }
 
-    public Pago registrarPago(Factura factura, MedioPago medioPago, String operador){
+    // Registra un pago por una lista de facturas
+    private Pago registrarPago(List<Factura> facturas, MedioPago medioPago, String operador) {
+        double montoTotal = facturas.stream().mapToDouble(Factura::getTotal).sum();
+
         Pago pago = new Pago();
         pago.setFecha(LocalDateTime.now());
-        pago.setMonto(factura.getTotal());
+        pago.setMonto(montoTotal);
         pago.setMedioPago(medioPago);
         pago.setOperador(operador);
-        pago.setFacturasAplicadas(List.of(factura));
-
-        factura.getPagos().add(pago);
-        factura.setEstado(EstadoFactura.PAGADA);
+        pago.setFacturasAplicadas(facturas);
 
         em.getTransaction().begin();
         em.persist(pago);
-        em.merge(factura); // Esto actualiza la factura con el nuevo pago
+        for (Factura f : facturas) {
+            f.getPagos().add(pago);
+            f.setEstado(EstadoFactura.PAGADA);
+            em.merge(f);
+        }
         em.getTransaction().commit();
 
         return pago;
     }
 
-    //Genera y persiste el pedido final
-    public Pedido generarYGuardarPedido(int idUsuario, Usuario usuario) {
-        //Obtiene el carrito activo
-        Carrito carrito = carritoManager.obtenerCarrito(idUsuario);
-
-        if (carrito == null || carrito.getCarrito().isEmpty()) {
-            System.out.println("Carrito vacio, no se puede generar el pedido");
-            return null;
+    // Pide al usuario qué facturas pendientes desea pagar
+    private List<Factura> obtenerFacturasSeleccionadas(int idUsuario) {
+        List<Factura> pendientes = buscarFacturasPendientes(idUsuario);
+        if (pendientes.isEmpty()) {
+            System.out.println("No hay facturas pendientes.");
+            return Collections.emptyList();
         }
 
-        //Crear pedido
-        Pedido pedido = new Pedido();
-        pedido.setUsuario(usuario);
-        pedido.setCarrito(carrito);
-        pedido.setFecha(LocalDateTime.now());
-
-        // Calcular subtotal
-        double subtotal = 0;
-        for (ItemCarrito item : carrito.getCarrito()) {
-            subtotal += item.getProducto().getPrecioActual() * item.getCantidad();
+        System.out.println("Facturas pendientes:");
+        for (Factura f : pendientes) {
+            System.out.println("ID: " + f.getId() + " | Total: $" + f.getTotal());
         }
 
-        double impuestos = subtotal * 0.21; //IVA: 21%
-        double total = subtotal + impuestos;
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Ingrese los IDs de las facturas a pagar (separados por coma): ");
+        String input = sc.nextLine();
 
-        pedido.setSubtotal(subtotal);
-        pedido.setImpuestos(impuestos);
-        pedido.setTotal(total);
-
-        //Gnerar la lista de productos en productoList
-        pedido.getProductoList();
-
-        //Guardar pedido en la base
-
-        em.getTransaction().begin();
-        em.persist(pedido);
-        em.getTransaction().commit();
-
-        return pedido;
-    }
-
-    public void cerrarPedidoYRegistrarPago(int idUsuario, Usuario usuario, MedioPago medioPago, String operador){
-        Pedido pedido = generarYGuardarPedido(idUsuario, usuario);
-        if(pedido == null){
-            System.out.println("No se generó el pedido");
-            return;
-        }
-
-        Factura factura = facturarPedido(pedido);
-        registrarPago(factura, medioPago, operador);
-    }
-
-    public void listarPagos(Usuario usuario){
-        String jpql = """
-            SELECT DISTINCT pago FROM Pago pago
-            JOIN pago.facturasAplicadas factura
-            JOIN factura.pedido pedido
-            WHERE pedido.usuario = :usuario
-        """;
-
-        List<Pago> pagos = em.createQuery(jpql, Pago.class).setParameter("usuario", usuario).getResultList();
-
-        if(pagos.isEmpty()){
-            System.out.println("El usuario no tiene pagos registrados");
-            return;
-        }
-
-        System.out.println("PAGOS REGISTRADOS DE: " + usuario.getNombre());
-        System.out.println("DNI:" + usuario.getDni());
-        for (Pago pago : pagos) {
-            System.out.println("---------------------");
-            System.out.println("ID PAGO: " + pago.getId());
-            System.out.println("Fecha: " + pago.getFecha());
-            System.out.println("Monto: $" + pago.getMonto());
-            System.out.println("Medio: " + pago.getMedioPago());
-            System.out.println("Operador: " + (pago.getOperador() != null ? pago.getOperador() : "N/A"));
-            System.out.print("Facturas asociadas (IDs): ");
-            for (Factura f : pago.getFacturasAplicadas()) {
-                System.out.print(f.getId() + " ");
+        String[] idsFacturas = input.split(",");
+        List<Integer> idsSeleccionados = new ArrayList<>();
+        for (String id : idsFacturas) {
+            try {
+                idsSeleccionados.add(Integer.parseInt(id.trim()));
+            } catch (NumberFormatException e) {
+                System.out.println("ID inválido: " + id);
             }
-            System.out.println();
         }
+
+        return pendientes.stream()
+                .filter(f -> idsSeleccionados.contains(f.getId()))
+                .toList();
     }
 }

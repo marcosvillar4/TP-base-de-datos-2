@@ -4,8 +4,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import jakarta.persistence.TypedQuery;
-import org.example.clases.Sesion;
-import org.example.clases.Usuario;
+import org.example.clases.*;
 
 import java.time.LocalDateTime;
 import java.util.LinkedList;
@@ -15,14 +14,9 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Hello, World!");
-
-
         Scanner sc = new Scanner(System.in);
 
-
         int opcion = 0;
-
 
         EntityManagerFactory usrManagerFactory =
                 Persistence.createEntityManagerFactory(
@@ -30,6 +24,9 @@ public class Main {
         EntityManager usrEntityManager = usrManagerFactory.createEntityManager();
 
         Usuario currentUser = null;
+
+        CarritoManager carritoManager = new CarritoManager();
+        PedidoManager pedidoManager = new PedidoManager(usrEntityManager, carritoManager);
 
         while (currentUser == null) {
             System.out.println("Bienvenido al sistema de pedidos. Elija una opción:");
@@ -157,12 +154,12 @@ public class Main {
 
                         System.out.println("Ingrese el id del usuario:");
 
-                        int idUsuario = sc.nextInt();
+                        int idUsuarioBuscar = sc.nextInt();
 
                         TypedQuery<Usuario> usrFindQuery = usrEntityManager.createQuery("SELECT u FROM Usuario u WHERE u.id =:idUsuario", Usuario.class);
-                        List<Usuario> usuarios = usrFindQuery.setParameter("idUsuario",idUsuario).getResultList();
+                        List<Usuario> usuarios = usrFindQuery.setParameter("idUsuario",idUsuarioBuscar).getResultList();
 
-                        if (usuarios != null){
+                        if (!usuarios.isEmpty()){
                             for (Usuario usuario : usuarios) {
                                 System.out.println("ID del usuario: " + usuario.getId() + ".");
                                 System.out.println("Nombre del usuario: " + usuario.getNombre() + ".");
@@ -179,6 +176,40 @@ public class Main {
 
                     case 2:
 
+                        break;
+
+                    case 3:
+
+                        System.out.println("Ingresa el ID del producto a eliminar:");
+
+                        int idProducto = sc.nextInt();
+
+                        break;
+
+                    case 4:
+
+                        System.out.println("Ingresa el ID del producto a editar:");
+
+                        int idProductoEditar =  sc.nextInt();
+
+
+
+                    case 6:
+                        System.out.println("Ingrese el ID del usuario:");
+
+                        int idUsuarioFacturas = sc.nextInt();
+
+                        pedidoManager.listarFacturas(idUsuarioFacturas);
+
+                        break;
+
+                    case 7:
+
+                        System.out.println("Cerrando sesión...");
+
+                        currentUser.actualizarCategoria();
+
+                        break;
                 }
             }
         }

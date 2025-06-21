@@ -2,7 +2,6 @@ package org.example.clases;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 
 import java.io.Serializable;
