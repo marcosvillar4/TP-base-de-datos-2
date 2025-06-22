@@ -12,26 +12,26 @@ public class CarritoManager {
         this.redis = new Jedis("localhost", 6379);
     }
 
-    public Carrito obtenerCarrito(int idUsuario){
+    public Carrito obtenerCarrito(String idUsuario){
         String json = redis.get(PREFIX + idUsuario);
         return json != null ? gson.fromJson(json, Carrito.class) : new Carrito();
     }
 
-    public void guardarCarrito(int idUsuario, Carrito carrito){
+    public void guardarCarrito(String idUsuario, Carrito carrito){
         String json = gson.toJson(carrito);
         redis.set(PREFIX+idUsuario, json);
     }
 
-    public void eliminarCarrito(int idUsuario){
+    public void eliminarCarrito(String idUsuario){
         redis.del(PREFIX+idUsuario);
     }
 
-    public void snapshotCarrito(int idUsuario, Carrito carrito){
+    public void snapshotCarrito(String idUsuario, Carrito carrito){
         String key = PREFIX+"snapshots:"+idUsuario;
         redis.lpush(key, gson.toJson(carrito));
     }
 
-    public Carrito deshacer(int idUsuario){
+    public Carrito deshacer(String idUsuario){
         String key = PREFIX+"snapshots:"+idUsuario;
         String lastVersion = redis.lpop(key);
         return lastVersion != null ? gson.fromJson(lastVersion, Carrito.class) : new Carrito();

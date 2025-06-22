@@ -9,7 +9,7 @@ import org.example.clases.Enums.MedioPago;
 public class Pago {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private String id;
     private LocalDateTime fecha;
     private double monto;
 
@@ -20,7 +20,7 @@ public class Pago {
     @ManyToMany
     private List<Factura> facturasAplicadas;
 
-    public Pago(int id, LocalDateTime fecha, double monto, MedioPago medioPago, List<Factura> facturasAplicadas) {
+    public Pago(String id, LocalDateTime fecha, double monto, MedioPago medioPago, List<Factura> facturasAplicadas) {
         this.id = id;
         this.fecha = fecha;
         this.monto = monto;
@@ -31,8 +31,8 @@ public class Pago {
     public Pago() {}
 
     //Getters y setters
-    public int getId() {return id;}
-    public void  setId(int id) {this.id=id;}
+    public String getId() {return id;}
+    public void  setId(String id) {this.id=id;}
     public LocalDateTime getFecha() {return fecha;}
     public void setFecha(LocalDateTime fecha) {this.fecha=fecha;}
     public double getMonto() {return monto;}

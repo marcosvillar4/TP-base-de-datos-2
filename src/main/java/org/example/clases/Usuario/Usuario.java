@@ -16,7 +16,7 @@ import java.time.LocalDate;
 public class Usuario implements Serializable {
 
     @Id
-    private int id;
+    private String id;
 
     private int dni;
     private String passwd;
@@ -33,7 +33,7 @@ public class Usuario implements Serializable {
     private CategoriaUsuario categoria;
     private String condicionIva;
 
-    public Usuario(int id, int dni, String passwd, String nombre, String direccion) {
+    public Usuario(String id, int dni, String passwd, String nombre, String direccion) {
         this.id = id;
         this.dni = dni;
         this.passwd = passwd;
@@ -80,11 +80,11 @@ public class Usuario implements Serializable {
         return categoria;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 

@@ -2,13 +2,9 @@ package org.example.clases.Pedido;
 
 import jakarta.persistence.*;
 
-import java.util.List;
-import java.util.*;
 import java.time.*;
 
 import org.example.clases.Carrito.Carrito;
-
-import org.example.clases.Producto.Producto;
 import org.example.clases.Usuario.Usuario;
 
 @Entity
@@ -30,31 +26,7 @@ public class Pedido {
     private LocalDateTime fecha;
 
 
-    List<String> productoList;
-
-    private void cerrarCarrito(){
-        //Inicializar si todavia productoList no esta creado
-        if(productoList == null){
-            productoList = new ArrayList<>();
-        }
-        /*
-        //Vacia la lista antes de volver a llenarla
-        productoList.clear();
-        for (ItemCarrito itemCarrito : carrito.getCarrito()) {
-            for (int i = 0; i < itemCarrito.getCantidad(); i++) {
-                productoList.add(itemCarrito.getIdProducto());
-            }
-        }*/
-
-        for (String s : carrito.getCarrito().keySet()) {
-            for (int i = 0; i < carrito.getCarrito().get(s); i++){
-                productoList.add(s);
-            }
-        }
-
-
-    }
-
+    //Getters y setters
     public LocalDateTime getFecha() {
         return fecha;
     }
@@ -100,8 +72,4 @@ public class Pedido {
         this.carrito = carrito;
     }
 
-    public List<String> getProductoList() {
-        cerrarCarrito();
-        return productoList;
-    }
 }

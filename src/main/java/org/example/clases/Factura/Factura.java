@@ -10,7 +10,7 @@ public class Factura {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private String id;
 
     @OneToOne
     private Pedido pedido;
@@ -62,5 +62,5 @@ public class Factura {
     public void setEstado(EstadoFactura estado) {
         this.estado = estado;
     }
-    public int getId(){ return id;}
+    public String getId(){ return id;}
 }
