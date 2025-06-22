@@ -5,6 +5,7 @@ import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import jakarta.persistence.TypedQuery;
 import org.example.clases.Carrito.CarritoManager;
+import org.example.clases.Enums.MedioPago;
 import org.example.clases.Mongo.MongoManager;
 import org.example.clases.Mongo.ProductoCatalogoDAO;
 import org.example.clases.Mongo.ProductoCatalogoService;
@@ -208,6 +209,7 @@ public class Main {
 
                         String idProductoEliminar  = sc.nextLine();
 
+                        productoCatalogoDAO.eliminarProducto(idProductoEliminar);
                         break;
 
                     case 4:
@@ -318,13 +320,46 @@ public class Main {
                             System.out.println("_______________________________________");
                             System.out.println("ID: " + document.get("_id").toString());
                             System.out.println("Nombre: " + document.get("nombre").toString());
-                            //System.out.println("Descripcion: " + document.get("descripcion").toString());
+                            System.out.println("Descripcion: " + document.get("descripcion").toString());
                             System.out.println("Precio: " + document.get("precio"));
                             System.out.println("Stock: " + document.get("cantidad"));
                         }
                         break;
 
                     case 2:
+                        break;
+                    case 4:
+                        int medioPago = 0;
+                        MedioPago medio = null;
+                        while(!List.of(1,2,3,4,5).contains(medioPago)) {
+                            System.out.println("Elija el medio de pago: ");
+                            System.out.println("1. Efectivo");
+                            System.out.println("2. Transferencia");
+                            System.out.println("3. Tarjeta");
+                            System.out.println("4. En punto de retiro");
+                            System.out.println("5. Cuenta corriente");
+                            medioPago = sc.nextInt();
+
+                            medio = switch (medioPago) {
+                                case 1 -> MedioPago.EFECTIVO;
+                                case 2 -> MedioPago.TRANSFERENCIA;
+                                case 3 -> MedioPago.TARJETA;
+                                case 4 -> MedioPago.EN_PUNTO_RETIRO;
+                                case 5 -> MedioPago.CTA_CTE;
+                                default -> null;
+                            };
+
+                        }
+                        System.out.println("Ingrese el nombre del operador: ");
+                        sc.nextLine();
+                        String operador = sc.nextLine();
+
+                        pedidoManager.cerrarPedidoYRegistrarPago(currentUser.getId(), currentUser, medio, operador);
+                    case 5:
+
+                        System.out.println("Cerrando sesion...");
+                        currentUser.actualizarCategoria();
+                        break;
                 }
             }
 
