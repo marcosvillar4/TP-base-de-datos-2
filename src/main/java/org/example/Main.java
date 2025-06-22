@@ -198,6 +198,12 @@ public class Main {
                         int precio = sc.nextInt();
                         System.out.println("Cantidad del Producto: ");
                         int cantidad = sc.nextInt();
+                        /*
+                        System.out.println("Ingrese el URL de la foto/video del producto:");
+                        String url = sc.nextLine();
+                        System.out.println("Ingrese algún comentario del producto:");
+                        String comentario = sc.nextLine();
+                        */
 
                         Producto producto = new Producto(nombre, descripcion, precio, cantidad);
                         productoCatalogoDAO.insertarProducto(producto);
@@ -209,7 +215,7 @@ public class Main {
                     case 3:
 
                         System.out.println("Ingresa el ID del producto a eliminar:");
-                        String idProductoEliminar  = sc.nextLine();
+                        String idProductoEliminar = sc.nextLine();
                         productoCatalogoDAO.eliminarProducto(idProductoEliminar);
                         break;
 
@@ -264,7 +270,11 @@ public class Main {
                                     System.out.println("El número ingresado no es válido.");
                                     break;
                             }
+                        } else {
+                            System.out.println("El ID del producto no existe.");
                         }
+
+                        break;
 
 
                     case 6:
@@ -336,7 +346,7 @@ public class Main {
                         int cantidadAgregar = sc.nextInt();
 
                         if (productoCatalogoDAO.existeProducto(idProductoAgregar)){
-                            if (Integer.parseInt(productoCatalogoDAO.getProductoById(idProductoAgregar).get("cantidad").toString()) > cantidadAgregar){
+                            if (Integer.parseInt(productoCatalogoDAO.getProductoById(idProductoAgregar).get("cantidad").toString()) >= cantidadAgregar){
                                 carrito.agregarItem(idProductoAgregar, cantidadAgregar);
                             } else {
                                 System.out.println("Imposible agregar mas productos que stock disponible");
