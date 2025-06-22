@@ -63,7 +63,7 @@ public class ProductoCatalogoDAO {
         }
     }
 
-    public boolean encontrarProducto(String idProductoBuscar) {
+    public boolean existeProducto(String idProductoBuscar) {
         return coleccion.find(eq("_id", new ObjectId(idProductoBuscar))).first() != null;
     }
 

@@ -19,6 +19,8 @@ import java.util.*;
 
 import org.bson.Document;
 
+import javax.print.Doc;
+
 public class Main {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
@@ -217,7 +219,7 @@ public class Main {
 
                         String idProductoEditar =  sc.nextLine();
 
-                        if (productoCatalogoDAO.encontrarProducto(idProductoEditar)){
+                        if (productoCatalogoDAO.existeProducto(idProductoEditar)){
                             System.out.println("Elige el campo a editar:");
                             System.out.println("1. Editar el nombre");
                             System.out.println("2. Editar la descripción");
@@ -315,8 +317,6 @@ public class Main {
 
                         ArrayList<Document> documentList = productoCatalogoDAO.getAll();
 
-
-
                         for (Document document : documentList) {
 
                             System.out.println("_______________________________________");
@@ -335,7 +335,7 @@ public class Main {
                         System.out.println("Cantidad: ");
                         int cantidadAgregar = sc.nextInt();
 
-                        if (productoCatalogoDAO.encontrarProducto(idProductoAgregar)){
+                        if (productoCatalogoDAO.existeProducto(idProductoAgregar)){
                             if (Integer.parseInt(productoCatalogoDAO.getProductoById(idProductoAgregar).get("cantidad").toString()) > cantidadAgregar){
                                 carrito.agregarItem(idProductoAgregar, cantidadAgregar);
                             } else {
@@ -360,6 +360,22 @@ public class Main {
                             }
                         } else {
                             System.out.println("Producto no encontrado en el carrito");
+                        }
+
+                        break;
+
+                    case 4:
+
+                        System.out.println("CARRITO: ");
+                        System.out.println("_________________________________________");
+                        for (String s : carrito.getCarrito().keySet()) {
+                            Document document = productoCatalogoDAO.getProductoById(s);
+                            System.out.println("_________________________________________");
+                            System.out.println("ID: " + document.get("_id").toString());
+                            System.out.println("Nombre: " + document.get("nombre").toString());
+                            System.out.println("Descripcion: " + document.get("descripcion").toString());
+                            System.out.println("Precio: " + document.get("precio"));
+                            System.out.println("Stock: " + document.get("cantidad"));
                         }
 
 
