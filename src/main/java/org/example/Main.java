@@ -207,9 +207,7 @@ public class Main {
                     case 3:
 
                         System.out.println("Ingresa el ID del producto a eliminar:");
-
                         String idProductoEliminar  = sc.nextLine();
-
                         productoCatalogoDAO.eliminarProducto(idProductoEliminar);
                         break;
 
@@ -354,7 +352,16 @@ public class Main {
                         System.out.println("Cantidad: ");
                         int cantidadEliminar = sc.nextInt();
 
-                        carrito.eliminarItem(idProductoEliminar, cantidadEliminar);
+                        if (carrito.getCarrito().containsKey(idProductoEliminar)){
+                            if (carrito.getCarrito().get(idProductoEliminar) >= cantidadEliminar){
+                                carrito.eliminarItem(idProductoEliminar, cantidadEliminar);
+                            } else {
+                                System.out.println("Imposible eliminar mas productos de los que hay en el carrito");
+                            }
+                        } else {
+                            System.out.println("Producto no encontrado en el carrito");
+                        }
+
 
                     case 5:
                         int medioPago = 0;
