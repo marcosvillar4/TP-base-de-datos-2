@@ -7,6 +7,8 @@ import org.example.clases.Enums.EstadoFactura;
 import org.example.clases.Enums.MedioPago;
 import org.example.clases.Factura.Factura;
 import org.example.clases.Factura.Pago;
+import org.example.clases.Mongo.MongoManager;
+import org.example.clases.Mongo.ProductoCatalogoDAO;
 import org.example.clases.Usuario.Usuario;
 
 import java.time.LocalDateTime;
@@ -134,9 +136,18 @@ public class PedidoManager {
         pedido.setCarrito(carrito);
         pedido.setFecha(LocalDateTime.now());
 
+        /*
         double subtotal = carrito.getCarrito().stream()
                 .mapToDouble(item -> item.getProducto().getPrecio() * item.getCantidad())
-                .sum();
+                .sum();*/
+
+        ProductoCatalogoDAO productoCatalogoDAO = new ProductoCatalogoDAO(MongoManager.getDatabase());
+
+        double subtotal = 0;
+
+        for (String s : carrito.getCarrito().keySet()) {
+            subtotal = subtotal + carrito.getCarrito().get(s) * Double.parseDouble(productoCatalogoDAO.getProductoById(s).get("precio").toString());
+        }
 
         double impuestos = subtotal * 0.21; //IVA
         double total = subtotal + impuestos;

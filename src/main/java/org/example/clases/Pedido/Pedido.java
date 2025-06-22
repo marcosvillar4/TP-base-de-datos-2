@@ -8,6 +8,7 @@ import java.time.*;
 
 import org.example.clases.Carrito.Carrito;
 import org.example.clases.Carrito.ItemCarrito;
+import org.example.clases.Producto.Producto;
 import org.example.clases.Usuario.Usuario;
 
 @Entity
@@ -28,6 +29,7 @@ public class Pedido {
     private double descuentos;
     private LocalDateTime fecha;
 
+
     List<String> productoList;
 
     private void cerrarCarrito(){
@@ -35,14 +37,22 @@ public class Pedido {
         if(productoList == null){
             productoList = new ArrayList<>();
         }
-
+        /*
         //Vacia la lista antes de volver a llenarla
         productoList.clear();
         for (ItemCarrito itemCarrito : carrito.getCarrito()) {
             for (int i = 0; i < itemCarrito.getCantidad(); i++) {
-                productoList.add(itemCarrito.getProducto().getId());
+                productoList.add(itemCarrito.getIdProducto());
+            }
+        }*/
+
+        for (String s : carrito.getCarrito().keySet()) {
+            for (int i = 0; i < carrito.getCarrito().get(s); i++){
+                productoList.add(s);
             }
         }
+
+
     }
 
     public LocalDateTime getFecha() {

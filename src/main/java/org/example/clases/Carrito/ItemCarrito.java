@@ -4,11 +4,11 @@ import org.example.clases.Producto.Producto;
 
 public class ItemCarrito {
     int id;
-    Producto producto;
+    String idProducto;
     int cantidad;
 
-    public ItemCarrito(Producto producto, int cantidad) {
-        this.producto = producto;
+    public ItemCarrito(String producto, int cantidad) {
+        this.idProducto = producto;
         this.cantidad = cantidad;
     }
 
@@ -19,12 +19,15 @@ public class ItemCarrito {
     public void setCantidad(int cantidad) {
         this.cantidad = cantidad;
     }
-    public Producto getProducto() {
-        return producto;
+
+    public String getIdProducto() {
+        return idProducto;
     }
-    public void setProducto(Producto producto) {
-        this.producto = producto;
+
+    public void setIdProducto(String idProducto) {
+        this.idProducto = idProducto;
     }
+
     public int getId() {
         return id;
     }

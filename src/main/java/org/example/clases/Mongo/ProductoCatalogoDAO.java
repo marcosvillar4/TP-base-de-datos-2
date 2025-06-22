@@ -13,11 +13,11 @@ import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.*;
 public class ProductoCatalogoDAO {
     private final MongoCollection<Document> coleccion;
-    private final HistorialCambiosService historialService;
+    //private final HistorialCambiosService historialService;
 
     public ProductoCatalogoDAO(MongoDatabase db) {
         this.coleccion = db.getCollection("productos");
-        this.historialService = new HistorialCambiosService(coleccion);
+        //this.historialService = new HistorialCambiosService(coleccion);
     }
 
     //Inserta el producto en la base
@@ -65,5 +65,9 @@ public class ProductoCatalogoDAO {
 
     public boolean encontrarProducto(String idProductoBuscar) {
         return coleccion.find(eq("_id", new ObjectId(idProductoBuscar))).first() != null;
+    }
+
+    public Document getProductoById(String id){
+        return coleccion.find(eq("_id", new ObjectId(id))).first();
     }
 }

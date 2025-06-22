@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import jakarta.persistence.TypedQuery;
+import org.example.clases.Carrito.Carrito;
 import org.example.clases.Carrito.CarritoManager;
 import org.example.clases.Enums.MedioPago;
 import org.example.clases.Mongo.MongoManager;
@@ -225,7 +226,7 @@ public class Main {
                             System.out.println("3. Editar el precio");
                             System.out.println("4. Editar la foto/video");
                             System.out.println("5. Editar el comentario");
-                            
+
                             int opcionEditar = sc.nextInt();
 
                             switch (opcionEditar){
@@ -294,6 +295,9 @@ public class Main {
         } else {
 
             int opcion2 = 0;
+
+            Carrito carrito = carritoManager.obtenerCarrito(currentUser.getId());
+
             while (opcion2 != 6){
 
 
@@ -302,9 +306,9 @@ public class Main {
                 System.out.println("1. Ver catálogo de productos");
                 System.out.println("2. Agregar item al carrito");
                 System.out.println("3. Eliminar item del carrito");
-                System.out.println("3. Ver carrito");
-                System.out.println("4. Confirmar y pagar pedido");
-                System.out.println("5. Salir");
+                System.out.println("4. Ver carrito");
+                System.out.println("5. Confirmar y pagar pedido");
+                System.out.println("6. Salir");
 
                 opcion2 = sc.nextInt();
 
@@ -327,8 +331,32 @@ public class Main {
                         break;
 
                     case 2:
+
+                        System.out.println("ID del producto a agregar: ");
+                        String idProductoAgregar = sc.nextLine();
+                        System.out.println("Cantidad: ");
+                        int cantidadAgregar = sc.nextInt();
+
+                        if (productoCatalogoDAO.encontrarProducto(idProductoAgregar)){
+                            if (Integer.parseInt(productoCatalogoDAO.getProductoById(idProductoAgregar).get("cantidad").toString()) > cantidadAgregar){
+                                carrito.agregarItem(idProductoAgregar, cantidadAgregar);
+                            } else {
+                                System.out.println("Imposible agregar mas productos que stock disponible");
+                            }
+                        } else {
+                            System.out.println("Producto no encontrado");
+                        }
                         break;
-                    case 4:
+                    case 3:
+
+                        System.out.println("ID del producto a eliminar: ");
+                        String idProductoEliminar = sc.nextLine();
+                        System.out.println("Cantidad: ");
+                        int cantidadEliminar = sc.nextInt();
+
+                        carrito.eliminarItem(idProductoEliminar, cantidadEliminar);
+
+                    case 5:
                         int medioPago = 0;
                         MedioPago medio = null;
                         while(!List.of(1,2,3,4,5).contains(medioPago)) {
@@ -355,7 +383,7 @@ public class Main {
                         String operador = sc.nextLine();
 
                         pedidoManager.cerrarPedidoYRegistrarPago(currentUser.getId(), currentUser, medio, operador);
-                    case 5:
+                    case 6:
 
                         System.out.println("Cerrando sesion...");
                         currentUser.actualizarCategoria();

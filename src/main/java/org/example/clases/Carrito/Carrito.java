@@ -1,7 +1,6 @@
 package org.example.clases.Carrito;
 
 import org.example.clases.Enums.EstadoCarrito;
-import org.example.clases.Producto.Producto;
 
 import java.util.*;
 
@@ -9,15 +8,16 @@ import java.util.*;
 
 public class Carrito {
 
-    private LinkedList<ItemCarrito> carrito;
+    private Map<String, Integer> carrito;
+    //private LinkedList<ItemCarrito> carrito;
     private EstadoCarrito estado;
 
     public Carrito() {
-        carrito = new LinkedList<>();
+        carrito = new HashMap<>();
         estado = EstadoCarrito.PENDIENTE;
     }
 
-    public LinkedList<ItemCarrito> getCarrito() {
+    public Map<String, Integer> getCarrito() {
         return carrito;
     }
 
@@ -29,9 +29,15 @@ public class Carrito {
         this.estado = estado;
     }
 
-    public void agregarItem(Producto producto, int cantidad) {
-        for(ItemCarrito item : carrito){
-            if(item.getProducto().getId().equals(producto.getId())){
+    public void agregarItem(String producto, int cantidad) {
+        if (carrito.containsKey(producto)){
+            carrito.replace(producto, carrito.get(producto) + cantidad);
+        } else {
+            carrito.put(producto, cantidad);
+        }
+
+        /*for(ItemCarrito item : carrito){
+            if(item.getIdProducto().equals(producto)){
                 item.setCantidad(item.getCantidad() + cantidad);
                 return;
             }
@@ -39,20 +45,32 @@ public class Carrito {
 
         ItemCarrito nuevo = new ItemCarrito(producto, cantidad);
         nuevo.setId(carrito.size() + 1);
-        carrito.add(nuevo);
+        carrito.add(nuevo);*/
     }
 
-    public void eliminarItem(String idProducto){
-        carrito.removeIf(item -> item.getProducto().getId().equals(idProducto));
+    public void eliminarItem(String idProducto, int cantidad){
+
+        if (carrito.containsKey(idProducto)){
+            if (cantidad <= carrito.get(idProducto)){
+                carrito.replace(idProducto, carrito.get(idProducto) - cantidad);
+            }
+        }
+
+        //carrito.removeIf(item -> item.getIdProducto().equals(idProducto));
     }
 
     public void modificarCantidad(String idProducto, int cantidad){
-        for(ItemCarrito item : carrito){
-            if(item.getProducto().getId().equals(idProducto) ){
+
+        if (carrito.containsKey(idProducto)){
+            carrito.replace(idProducto,cantidad);
+        }
+
+        /*for(ItemCarrito item : carrito){
+            if(item.getIdProducto().equals(idProducto)){
                 item.setCantidad(cantidad);
                 return;
             }
-        }
+        }*/
     }
 
     public void vaciarCarrito(){
