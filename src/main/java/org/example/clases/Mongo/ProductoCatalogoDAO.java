@@ -13,11 +13,9 @@ import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.*;
 public class ProductoCatalogoDAO {
     private final MongoCollection<Document> coleccion;
-    //private final HistorialCambiosService historialService;
 
     public ProductoCatalogoDAO(MongoDatabase db) {
         this.coleccion = db.getCollection("productos");
-        //this.historialService = new HistorialCambiosService(coleccion);
     }
 
     //Inserta el producto en la base

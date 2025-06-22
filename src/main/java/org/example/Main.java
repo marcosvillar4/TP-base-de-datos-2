@@ -51,6 +51,7 @@ public class Main {
             String passwd;
             List<Usuario> usuarios = new LinkedList<>();
 
+            sc.nextLine(); //Limpia el bufer NO SACAR
             opcion = Integer.parseInt(sc.nextLine());
 
 
@@ -129,11 +130,7 @@ public class Main {
 
                         usrEntityManager.close();
                         usrManagerFactory.close();
-
-
                     }
-
-
                     break;
 
                 case 3:
@@ -150,17 +147,19 @@ public class Main {
 
         if (Objects.equals(currentUser.getNombre(), "admin")){
 
-            while (opcion != 8) {
+            while (opcion != 9) {
                 System.out.println("Elija una opción:");
                 System.out.println("1. Ver datos de usuario");
-                System.out.println("2. Agregar producto");
+                System.out.println("2. Agregar producto"); //Falta
                 System.out.println("3. Eliminar producto");
                 System.out.println("4. Editar producto");
-                System.out.println("5. Ver historial de cambios de productos");
+                System.out.println("5. Ver el historial de cambios de un producto");
                 System.out.println("6. Ver facturas de un usuario");
-                System.out.println("7. Ver catálogo de productos");
-                System.out.println("8. Cerrar sesión");
+                System.out.println("7. Ver pagos de un usuario");
+                System.out.println("8. Ver catálogo de productos");
+                System.out.println("9. Cerrar sesión");
 
+                sc.nextLine(); //Limpia el bufer NO SACAR
                 opcion = Integer.parseInt(sc.nextLine());
 
                 switch (opcion){
@@ -234,36 +233,47 @@ public class Main {
                             System.out.println("5. Editar el comentario");
 
                             int opcionEditar = sc.nextInt();
+                            String nombreOperador;
 
                             switch (opcionEditar){
                                 case 1:
                                     System.out.println("Ingrese el nuevo nombre del producto:");
                                     String nuevoNombre = sc.nextLine();
-                                    productoCatalogoService.actualizarNombre(idProductoEditar, nuevoNombre, currentUser.getNombre());
+                                    System.out.println("Ingrese el nombre del operador:");
+                                    nombreOperador = sc.nextLine();
+                                    productoCatalogoService.actualizarNombre(idProductoEditar, nuevoNombre, nombreOperador);
                                     break;
 
                                 case 2:
                                     System.out.println("Ingrese la nueva descripcion del producto:");
                                     String nuevaDescripcion = sc.nextLine();
-                                    productoCatalogoService.actualizarDescripcion(idProductoEditar, nuevaDescripcion, currentUser.getNombre());
+                                    System.out.println("Ingrese el nombre del operador:");
+                                    nombreOperador = sc.nextLine();
+                                    productoCatalogoService.actualizarDescripcion(idProductoEditar, nuevaDescripcion, nombreOperador);
                                     break;
 
                                 case 3:
                                     System.out.println("Ingrese el nuevo precio del producto:");
                                     double nuevoPrecio = sc.nextDouble();
-                                    productoCatalogoService.actualizarPrecio(idProductoEditar, nuevoPrecio, currentUser.getNombre());
+                                    System.out.println("Ingrese el nombre del operador:");
+                                    nombreOperador = sc.nextLine();
+                                    productoCatalogoService.actualizarPrecio(idProductoEditar, nuevoPrecio, nombreOperador);
                                     break;
 
                                 case 4:
                                     System.out.println("Ingrese el URL de la nueva foto/video del producto:");
                                     String nuevoURL = sc.nextLine();
-                                    productoCatalogoService.actualizarFoto(idProductoEditar, nuevoURL, currentUser.getNombre());
+                                    System.out.println("Ingrese el nombre del operador:");
+                                    nombreOperador = sc.nextLine();
+                                    productoCatalogoService.actualizarFoto(idProductoEditar, nuevoURL, nombreOperador);
                                     break;
 
                                 case 5:
                                     System.out.println("Ingrese el nuevo comentario del producto:");
                                     String nuevoComentario = sc.nextLine();
-                                    productoCatalogoService.actualizarComentarios(idProductoEditar, nuevoComentario, currentUser.getNombre());
+                                    System.out.println("Ingrese el nombre del operador:");
+                                    nombreOperador = sc.nextLine();
+                                    productoCatalogoService.actualizarComentarios(idProductoEditar, nuevoComentario, nombreOperador);
                                     break;
 
                                 default:
@@ -276,14 +286,32 @@ public class Main {
 
                         break;
 
+                    case 5:
+
+                        System.out.println("Ingrese el id del producto:");
+                        String idProducto = sc.nextLine();
+
+                        List<Document> historial = productoCatalogoService.getHistorialCambios(idProducto);
+
+                        for(Document cambio : historial){
+                            System.out.println("_____________________________________");
+                            System.out.println("Fecha: " + cambio.getDate("fecha"));
+                            System.out.println("Operador: " + cambio.getString("operador"));
+                            System.out.println("Campo modificado: " + cambio.getString("campo"));
+                            System.out.println("Valor anterior: " +  cambio.getDouble("valorAnterior"));
+                            System.out.println("Valor final: " +  cambio.getDouble("valorNuevo"));
+                        }
+
+                        break;
 
                     case 6:
+
                         System.out.println("Ingrese el ID del usuario:");
 
                         int idUsuarioFacturas = sc.nextInt();
 
-                        TypedQuery<Usuario> usrFindQuery2 = usrEntityManager.createQuery("SELECT u FROM Usuario u WHERE u.id =:idUsuario", Usuario.class);
-                        List<Usuario> usuarioFactura = usrFindQuery2.setParameter("idUsuario",idUsuarioFacturas).getResultList();
+                        TypedQuery<Usuario> FacturasFindQuery = usrEntityManager.createQuery("SELECT u FROM Usuario u WHERE u.id =:idUsuario", Usuario.class);
+                        List<Usuario> usuarioFactura = FacturasFindQuery.setParameter("idUsuario",idUsuarioFacturas).getResultList();
 
                         if (!usuarioFactura.isEmpty()){
                             pedidoManager.listarFacturas(idUsuarioFacturas);
@@ -293,7 +321,39 @@ public class Main {
 
                         break;
 
+                    case 7:
+
+                        System.out.println("Ingrese el ID del usuario:");
+
+                        int idUsuarioPagos = sc.nextInt();
+
+                        TypedQuery<Usuario> PagosFindQuery = usrEntityManager.createQuery("SELECT u FROM Usuario u WHERE u.id =:idUsuario", Usuario.class);
+                        List<Usuario> usuarioPagos = PagosFindQuery.setParameter("idUsuario",idUsuarioPagos).getResultList();
+
+                        if (!usuarioPagos.isEmpty()){
+                            pedidoManager.listarPagos(idUsuarioPagos);
+                        } else {
+                            System.out.println("ID del usuario no encontrado.");
+                        }
+
+                        break;
+
                     case 8:
+
+                        ArrayList<Document> documentList = productoCatalogoDAO.getAll();
+
+                        for (Document document : documentList) {
+
+                            System.out.println("_______________________________________");
+                            System.out.println("ID: " + document.get("_id").toString());
+                            System.out.println("Nombre: " + document.get("nombre").toString());
+                            System.out.println("Descripcion: " + document.get("descripcion").toString());
+                            System.out.println("Precio: " + document.get("precio"));
+                            System.out.println("Stock: " + document.get("cantidad"));
+                        }
+                        break;
+
+                    case 9:
 
                         System.out.println("Cerrando sesión...");
 
@@ -312,7 +372,7 @@ public class Main {
                 carrito = new Carrito();
             }
 
-            while (opcion2 != 6){
+            while (opcion2 != 10){
 
 
                 System.out.println("Elija una opcion:");
@@ -321,13 +381,19 @@ public class Main {
                 System.out.println("2. Agregar item al carrito");
                 System.out.println("3. Eliminar item del carrito");
                 System.out.println("4. Ver carrito");
-                System.out.println("5. Vaciar Carrito");
-                System.out.println("5. Confirmar y pagar pedido");
-                System.out.println("6. Salir");
+                System.out.println("5. Modificar la cantidad de un producto del carrito"); //Falta
+                System.out.println("6. Deshacer el último cambio del carrito");
+                System.out.println("7. Vaciar Carrito");
+                System.out.println("8. Confirmar carrito"); //Falta
+                System.out.println("9. Pagar pedidos"); //Falta
+                System.out.println("10. Ver facturas de pedidos");
+                System.out.println("11. Ver historial de pagos");
+                System.out.println("12. Salir");
 
                 opcion2 = sc.nextInt();
 
                 switch (opcion2){
+
                     case 1:
 
                         ArrayList<Document> documentList = productoCatalogoDAO.getAll();
@@ -353,6 +419,7 @@ public class Main {
                         if (productoCatalogoDAO.existeProducto(idProductoAgregar)){
                             if (Integer.parseInt(productoCatalogoDAO.getProductoById(idProductoAgregar).get("cantidad").toString()) >= cantidadAgregar){
                                 carrito.agregarItem(idProductoAgregar, cantidadAgregar);
+                                carritoManager.snapshotCarrito(currentUser.getId(), carrito);
                                 carritoManager.guardarCarrito(currentUser.getId(), carrito);
                             } else {
                                 System.out.println("No hay suficiente stock disponible");
@@ -363,51 +430,115 @@ public class Main {
 
 
                         break;
+
                     case 3:
 
-                        System.out.println("ID del producto a eliminar: ");
-                        String idProductoEliminar = sc.nextLine();
-                        System.out.println("Cantidad: ");
-                        int cantidadEliminar = sc.nextInt();
+                        if(!carrito.estaVacio()){
+                            System.out.println("ID del producto a eliminar: ");
+                            String idProductoEliminar = sc.nextLine();
 
-                        if (carrito.getCarrito().containsKey(idProductoEliminar)){
-                            if (carrito.getCarrito().get(idProductoEliminar) >= cantidadEliminar){
-                                carrito.eliminarItem(idProductoEliminar, cantidadEliminar);
-                                carritoManager.guardarCarrito(currentUser.getId(), carrito);
+                            if (carrito.getCarrito().containsKey(idProductoEliminar)){
+                                System.out.println("Cantidad: ");
+                                int cantidadEliminar = sc.nextInt();
+                                if (carrito.getCarrito().get(idProductoEliminar) >= cantidadEliminar){
+                                    carrito.eliminarItem(idProductoEliminar, cantidadEliminar);
+                                    carritoManager.snapshotCarrito(currentUser.getId(), carrito);
+                                    carritoManager.guardarCarrito(currentUser.getId(), carrito);
+                                } else {
+                                    System.out.println("Imposible eliminar mas productos de los que hay en el carrito");
+                                }
                             } else {
-                                System.out.println("Imposible eliminar mas productos de los que hay en el carrito");
+                                System.out.println("Producto no encontrado en el carrito");
                             }
-                        } else {
-                            System.out.println("Producto no encontrado en el carrito");
+                        } else{
+                            System.out.println("El carrito está vacío.");
                         }
 
                         break;
 
                     case 4:
 
-                        System.out.println("CARRITO: ");
-                        System.out.println("_________________________________________");
-                        for (String s : carrito.getCarrito().keySet()) {
-                            Document document = productoCatalogoDAO.getProductoById(s);
+                        if(!carrito.estaVacio()){
+                            System.out.println("CARRITO: ");
                             System.out.println("_________________________________________");
-                            System.out.println("ID: " + document.get("_id").toString());
-                            System.out.println("Nombre: " + document.get("nombre").toString());
-                            System.out.println("Descripcion: " + document.get("descripcion").toString());
-                            System.out.println("Precio: " + document.get("precio"));
-                            System.out.println("Stock: " + document.get("cantidad"));
+                            for (String s : carrito.getCarrito().keySet()) {
+                                Document document = productoCatalogoDAO.getProductoById(s);
+                                System.out.println("_________________________________________");
+                                System.out.println("ID: " + document.get("_id").toString());
+                                System.out.println("Nombre: " + document.get("nombre").toString());
+                                System.out.println("Descripcion: " + document.get("descripcion").toString());
+                                System.out.println("Precio: " + document.get("precio"));
+                                System.out.println("Stock: " + document.get("cantidad"));
+                            }
+                        } else{
+                            System.out.println("El carrito está vacío.");
                         }
 
                         break;
 
                     case 5:
 
-                        if (carrito.getCarrito() != null){
-                            carrito.vaciarCarrito();
-                            carritoManager.guardarCarrito(currentUser.getId(), carrito);
-                            System.out.println("Carrito Eliminado!");
+                        if(!carrito.estaVacio()){
+                            System.out.println("ID del producto a modificar la cantidad ");
+                            String idProductoCantidad = sc.nextLine();
+
+                            if (carrito.getCarrito().containsKey(idProductoCantidad)){
+                                System.out.println("Cantidad (ingrese 0 si quiere eliminarlo): ");
+                                int cantidadEditar = sc.nextInt();
+                                if (carrito.getCarrito().get(idProductoCantidad) >= cantidadEditar && cantidadEditar >= 0){
+                                    carrito.modificarCantidad(idProductoCantidad, cantidadEditar);
+
+                                    //Guarda snapshot para deshacer y guarda el carrito
+                                    carritoManager.snapshotCarrito(currentUser.getId(), carrito);
+                                    carritoManager.guardarCarrito(currentUser.getId(), carrito);
+                                } else {
+                                    if (cantidadEditar < 0){
+                                        System.out.println("Ingrese un valor correcto.");
+                                    }else {
+                                        System.out.println("Imposible agregar mas productos de los que hay en el carrito.");
+                                    }
+                                }
+                            } else {
+                                System.out.println("Producto no encontrado en el carrito");
+                            }
+                        } else{
+                            System.out.println("El carrito está vacío.");
                         }
 
+                        break;
+
                     case 6:
+
+                        System.out.println("Deshaciendo cambios...");
+                        carrito = carritoManager.deshacer(currentUser.getId());
+
+                        break;
+
+                    case 7:
+
+                        if (!carrito.estaVacio()){
+                            carrito.vaciarCarrito();
+
+                            //Guarda snapshot para deshacer y guarda el carrito
+                            carritoManager.snapshotCarrito(currentUser.getId(), carrito);
+                            carritoManager.guardarCarrito(currentUser.getId(), carrito);
+                            System.out.println("Carrito Eliminado!");
+                        } else{
+                            System.out.println("El carrito ya está vacío.");
+                        }
+
+                        break;
+
+                    case 8:
+
+                        if (!carrito.estaVacio()){
+                            System.out.println("Creando pedido...");
+
+                            carritoManager.snapshotCarrito(currentUser.getId(), null);
+                        }
+
+                    case 9:
+
                         int medioPago = 0;
                         MedioPago medio = null;
                         while(!List.of(1,2,3,4,5).contains(medioPago)) {
@@ -434,7 +565,21 @@ public class Main {
                         String operador = sc.nextLine();
 
                         pedidoManager.cerrarPedidoYRegistrarPago(currentUser.getId(), currentUser, medio, operador);
-                    case 7:
+
+                        break;
+
+                    case 10:
+
+                        pedidoManager.listarFacturas(currentUser.getId());
+                        break;
+
+                    case 11:
+
+                        pedidoManager.listarPagos(currentUser.getId());
+                        break;
+
+
+                    case 12:
 
                         System.out.println("Cerrando sesion...");
                         currentUser.actualizarCategoria();

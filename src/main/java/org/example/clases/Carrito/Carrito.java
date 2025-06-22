@@ -60,20 +60,20 @@ public class Carrito {
     }
 
     public void modificarCantidad(String idProducto, int cantidad){
-
         if (carrito.containsKey(idProducto)){
-            carrito.replace(idProducto,cantidad);
-        }
-
-        /*for(ItemCarrito item : carrito){
-            if(item.getIdProducto().equals(idProducto)){
-                item.setCantidad(cantidad);
-                return;
+            if(cantidad > 0) {
+                carrito.replace(idProducto, cantidad);
+            } else{
+                carrito.remove(idProducto);
             }
-        }*/
+        }
     }
 
     public void vaciarCarrito(){
         carrito.clear();
+    }
+
+    public boolean estaVacio(){
+        return carrito.isEmpty();
     }
 }

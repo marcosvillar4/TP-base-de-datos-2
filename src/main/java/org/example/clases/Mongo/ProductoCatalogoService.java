@@ -4,6 +4,8 @@ import com.mongodb.client.MongoCollection;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
+import java.util.*;
+
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.set;
 
@@ -51,6 +53,10 @@ public class ProductoCatalogoService {
             if(prod == null || nuevoComentario == null || nuevoComentario.isBlank()) return;
             String viejo = prod.getString("comentario");
             actualizarCampo(id, "comentario", nuevoComentario, viejo, operador);
+        }
+
+        public List<Document> getHistorialCambios(String idProd){
+            return historial.obtenerHistorialDelProducto(idProd);
         }
 
         private void actualizarCampo(String id, String campo, Object nuevoValor, Object valorAnterior, String operador) {

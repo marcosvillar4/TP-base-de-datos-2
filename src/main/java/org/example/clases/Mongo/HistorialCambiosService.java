@@ -1,9 +1,12 @@
 package org.example.clases.Mongo;
 
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
+import com.sun.jdi.ArrayReference;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
+import java.util.*;
 import java.time.LocalDateTime;
 
 import static com.mongodb.client.model.Filters.eq;
@@ -36,5 +39,14 @@ public class HistorialCambiosService {
         coleccion.updateOne(eq("_id", new ObjectId(id)), push("historialCambios", cambio));
     }
 
+    public List<Document> obtenerHistorialDelProducto(String idProducto){
+        List<Document> historial = new ArrayList<>();
+        try(MongoCursor<Document> cursor = coleccion.find(eq("_id", new ObjectId(idProducto))).iterator()){
+            while(cursor.hasNext()){
+                historial.add(cursor.next());
+            }
+        }
+        return historial;
+    }
 
 }
