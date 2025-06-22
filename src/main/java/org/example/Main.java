@@ -308,6 +308,10 @@ public class Main {
 
             Carrito carrito = carritoManager.obtenerCarrito(currentUser.getId());
 
+            if (carrito == null){
+                carrito = new Carrito();
+            }
+
             while (opcion2 != 6){
 
 
@@ -317,6 +321,7 @@ public class Main {
                 System.out.println("2. Agregar item al carrito");
                 System.out.println("3. Eliminar item del carrito");
                 System.out.println("4. Ver carrito");
+                System.out.println("5. Vaciar Carrito");
                 System.out.println("5. Confirmar y pagar pedido");
                 System.out.println("6. Salir");
 
@@ -348,12 +353,15 @@ public class Main {
                         if (productoCatalogoDAO.existeProducto(idProductoAgregar)){
                             if (Integer.parseInt(productoCatalogoDAO.getProductoById(idProductoAgregar).get("cantidad").toString()) >= cantidadAgregar){
                                 carrito.agregarItem(idProductoAgregar, cantidadAgregar);
+                                carritoManager.guardarCarrito(currentUser.getId(), carrito);
                             } else {
-                                System.out.println("Imposible agregar mas productos que stock disponible");
+                                System.out.println("No hay suficiente stock disponible");
                             }
                         } else {
                             System.out.println("Producto no encontrado");
                         }
+
+
                         break;
                     case 3:
 
@@ -365,6 +373,7 @@ public class Main {
                         if (carrito.getCarrito().containsKey(idProductoEliminar)){
                             if (carrito.getCarrito().get(idProductoEliminar) >= cantidadEliminar){
                                 carrito.eliminarItem(idProductoEliminar, cantidadEliminar);
+                                carritoManager.guardarCarrito(currentUser.getId(), carrito);
                             } else {
                                 System.out.println("Imposible eliminar mas productos de los que hay en el carrito");
                             }
@@ -388,8 +397,17 @@ public class Main {
                             System.out.println("Stock: " + document.get("cantidad"));
                         }
 
+                        break;
 
                     case 5:
+
+                        if (carrito.getCarrito() != null){
+                            carrito.vaciarCarrito();
+                            carritoManager.guardarCarrito(currentUser.getId(), carrito);
+                            System.out.println("Carrito Eliminado!");
+                        }
+
+                    case 6:
                         int medioPago = 0;
                         MedioPago medio = null;
                         while(!List.of(1,2,3,4,5).contains(medioPago)) {
@@ -416,7 +434,7 @@ public class Main {
                         String operador = sc.nextLine();
 
                         pedidoManager.cerrarPedidoYRegistrarPago(currentUser.getId(), currentUser, medio, operador);
-                    case 6:
+                    case 7:
 
                         System.out.println("Cerrando sesion...");
                         currentUser.actualizarCategoria();
