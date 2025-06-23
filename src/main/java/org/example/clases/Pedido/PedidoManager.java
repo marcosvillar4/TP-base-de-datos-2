@@ -9,6 +9,7 @@ import org.example.clases.Factura.Factura;
 import org.example.clases.Factura.Pago;
 import org.example.clases.Mongo.MongoManager;
 import org.example.clases.Mongo.ProductoCatalogoDAO;
+import org.example.clases.Mongo.ProductoCatalogoService;
 import org.example.clases.Usuario.Usuario;
 
 import java.time.LocalDateTime;
@@ -63,12 +64,17 @@ public class PedidoManager {
         ProductoCatalogoDAO productoCatalogoDAO = new ProductoCatalogoDAO(MongoManager.getDatabase());
 
         double subtotal = 0;
-
+        ProductoCatalogoService productoCatalogoService = new ProductoCatalogoService(MongoManager.getDatabase().getCollection("productos"));
         for (String s : carrito.getCarrito().keySet()) {
             subtotal = subtotal + carrito.getCarrito().get(s) * Double.parseDouble(productoCatalogoDAO.getProductoById(s).get("precio").toString());
+            productoCatalogoService.actualizarCantidad(s, (Integer.parseInt(productoCatalogoDAO.getProductoById(s).get("cantidad").toString()) - carrito.getCarrito().get(s)), usuario.getId());
 
         }
         pedido.setCarritoFinal(carrito.getCarrito());
+
+
+
+
 
         double impuestos = subtotal * 0.21; //IVA
         double total = subtotal + impuestos;
