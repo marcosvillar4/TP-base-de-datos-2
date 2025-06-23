@@ -1,10 +1,10 @@
 package org.example;
 
-import com.objectdb.o.EST;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import jakarta.persistence.TypedQuery;
+import org.bson.Document;
 import org.example.clases.Carrito.Carrito;
 import org.example.clases.Carrito.CarritoManager;
 import org.example.clases.Enums.EstadoFactura;
@@ -16,13 +16,12 @@ import org.example.clases.Mongo.ProductoCatalogoDAO;
 import org.example.clases.Mongo.ProductoCatalogoService;
 import org.example.clases.Pedido.PedidoManager;
 import org.example.clases.Producto.Producto;
-import org.example.clases.Usuario.*;
+import org.example.clases.Usuario.Sesion;
+import org.example.clases.Usuario.Usuario;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.bson.Document;
 
 
 
@@ -43,10 +42,7 @@ public class Main {
                         "objectdb/db/users.odb");
         EntityManager usrEntityManager = usrManagerFactory.createEntityManager();
 
-        EntityManagerFactory pedidoManagerFactory =
-                Persistence.createEntityManagerFactory(
-                        "objectdb/db/pedidos.odb");
-        EntityManager pedidoEntityManager = usrManagerFactory.createEntityManager();
+
 
         Usuario currentUser = null;
 
@@ -452,7 +448,7 @@ public class Main {
                 System.out.println("5. Modificar la cantidad de un producto del carrito");
                 System.out.println("6. Deshacer el último cambio del carrito");
                 System.out.println("7. Vaciar Carrito");
-                System.out.println("8. Confirmar carrito"); //Falta
+                System.out.println("8. Confirmar carrito");
                 System.out.println("9. Pagar pedidos");
                 System.out.println("10. Ver facturas del usuario");
                 System.out.println("11. Ver historial de pagos");
