@@ -55,6 +55,16 @@ public class ProductoCatalogoService {
             actualizarCampo(id, "comentario", nuevoComentario, viejo, operador);
         }
 
+    public void actualizarCantidad(String id, int nuevaCantidad, String operador){
+        Document prod = getProducto(id);
+        if(prod != null && nuevaCantidad != 0 && !operador.isBlank()){
+            int viejo = prod.getInteger("cantidad");
+            actualizarCampo(id, "cantidad", String.valueOf(nuevaCantidad), viejo, operador);
+        }
+
+
+    }
+
         public List<Document> getHistorialCambios(String idProd){
             return historial.obtenerHistorialDelProducto(idProd);
         }

@@ -581,69 +581,89 @@ public class Main {
 
                         List<Factura> facturas = pedidoManager.listarFacturas(currentUser.getId());
 
+
+
                         if (!facturas.isEmpty()) {
-                            System.out.println("ID del pago a realizar de las facturas a realizar, FORMATO: 1,2,3: ");
-                            String idFacturas = sc.nextLine();
-
-                            String[] ids = idFacturas.split("\\,");
-
-                            System.out.println(Arrays.toString(ids));
-
-                            LinkedList<Factura> facturasSelecionadas = new LinkedList<>();
-
-
+                            boolean checkFacturasPendientes = false;
+                            System.out.println("Facturas Pendientes: ");
+                            for (Factura factura : facturas) {
+                                if(factura.getEstado() == EstadoFactura.PENDIENTE){
+                                    checkFacturasPendientes = true;
+                                    System.out.println("ID: " + factura.getId() + " Total: " + factura.getTotal());
+                                }
+                            }
 
 
-                            if (ids.length != 0)
-                                for (String id : ids) {
-                                    for (Factura factura : facturas) {
-                                        if (Objects.equals(factura.getId(), id)) {
-                                            if (factura.getEstado() != EstadoFactura.PAGADA){
-                                                facturasSelecionadas.add(factura);
+                            if (checkFacturasPendientes) {
+                                System.out.println("ID del pago a realizar de las facturas a realizar, FORMATO: 1,2,3: ");
+                                String idFacturas = sc.nextLine();
+
+                                String[] ids = idFacturas.split("\\,");
+
+                                LinkedList<Factura> facturasSelecionadas = new LinkedList<>();
+
+                                if (ids.length != 0)
+                                    for (String id : ids) {
+                                        boolean check = false;
+                                        for (Factura factura : facturas) {
+                                            if (Objects.equals(factura.getId(), id)) {
+                                                if (factura.getEstado() != EstadoFactura.PAGADA){
+                                                    facturasSelecionadas.add(factura);
+                                                    check = true;
+                                                }
+
                                             }
-
                                         }
+                                        if (check){
+                                            System.out.println("Factura " + id + " Encontrada!");
+                                        } else {
+                                            System.out.println("Factura " + id + " No encontrada");
+                                        }
+
+                                    }
+                                else {
+                                    System.out.println("Usuario no tiene facturas generadas");
+                                }
+
+                                if (!facturasSelecionadas.isEmpty()) {
+                                    System.out.println("Facturas a pagar: " + facturasSelecionadas.toString().replace('[', ' ').replace(']', ' '));
+
+                                    int medioPago = 0;
+                                    MedioPago medio = null;
+                                    while (!List.of(1, 2, 3, 4, 5).contains(medioPago)) {
+                                        System.out.println("Elija el medio de pago: ");
+                                        System.out.println("1. Efectivo");
+                                        System.out.println("2. Transferencia");
+                                        System.out.println("3. Tarjeta");
+                                        System.out.println("4. En punto de retiro");
+                                        System.out.println("5. Cuenta corriente");
+                                        medioPago = sc.nextInt();
+                                        sc.nextLine(); //Limpia el buffer
+                                        medio = switch (medioPago) {
+                                            case 1 -> medio = MedioPago.EFECTIVO;
+                                            case 2 -> medio = MedioPago.TRANSFERENCIA;
+                                            case 3 -> medio = MedioPago.TARJETA;
+                                            case 4 -> medio = MedioPago.EN_PUNTO_RETIRO;
+                                            case 5 -> medio = MedioPago.CTA_CTE;
+                                            default -> null;
+                                        };
+                                    }
+                                    double monto = 0;
+
+                                    for (Factura facturasSelecionada : facturasSelecionadas) {
+                                        monto = monto + facturasSelecionada.getTotal();
                                     }
 
+                                    System.out.println("Nombre del operador: ");
+                                    String operador = sc.nextLine();
+
+                                    pedidoManager.registrarPago(facturasSelecionadas, medio, operador, currentUser);
+                                } else {
+                                    System.out.println("Ningun ID de factura valido fue aportado");
                                 }
-                            else {
-                                System.out.println("Usuario no debe facturas");
+                            } else {
+                                System.out.println("Usuario no debe facturas pendientes");
                             }
-
-                            System.out.println(facturasSelecionadas);
-
-                            int medioPago = 0;
-                            MedioPago medio = null;
-                            while (!List.of(1, 2, 3, 4, 5).contains(medioPago)) {
-                                System.out.println("Elija el medio de pago: ");
-                                System.out.println("1. Efectivo");
-                                System.out.println("2. Transferencia");
-                                System.out.println("3. Tarjeta");
-                                System.out.println("4. En punto de retiro");
-                                System.out.println("5. Cuenta corriente");
-                                medioPago = sc.nextInt();
-                                sc.nextLine(); //Limpia el buffer
-                                medio = switch (medioPago) {
-                                    case 1 -> medio = MedioPago.EFECTIVO;
-                                    case 2 -> medio = MedioPago.TRANSFERENCIA;
-                                    case 3 -> medio = MedioPago.TARJETA;
-                                    case 4 -> medio = MedioPago.EN_PUNTO_RETIRO;
-                                    case 5 -> medio = MedioPago.CTA_CTE;
-                                    default -> null;
-                                };
-                            }
-                            double monto = 0;
-
-                            for (Factura facturasSelecionada : facturasSelecionadas) {
-                                monto = monto + facturasSelecionada.getTotal();
-                            }
-
-                            String operador = sc.nextLine();
-
-                            pedidoManager.registrarPago(facturasSelecionadas, medio, operador, currentUser);
-
-                           //Pago pago = new Pago(String.valueOf(pedidoManager.listarPagos(currentUser.getId()).size() + 1), LocalDateTime.now(), monto, medio, facturasSelecionadas);
-
 
 
                         }
