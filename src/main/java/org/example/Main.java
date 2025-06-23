@@ -89,6 +89,11 @@ public class Main {
                         }
                         currentUser.getSesiones().add(new Sesion(LocalDateTime.now(), currentUser.getSesiones().size()));
 
+
+                        //NUEVO: Guardar (mergear) los cambios de sesiones del usuario en la base de datos
+                        usrEntityManager.getTransaction().begin();
+                        usrEntityManager.merge(currentUser);
+                        usrEntityManager.getTransaction().commit();
                     }
                     break;
 
@@ -372,6 +377,18 @@ public class Main {
 
                         currentUser.actualizarCategoria();
 
+                        //NUEVO: Guardar (mergear) los cambios de sesiones del usuario en la base de datos
+                        //Cierra la ultima sesion y la persiste
+                        List<Sesion> sesiones = currentUser.getSesiones();
+                        if (sesiones != null && !sesiones.isEmpty()) {
+                            Sesion ultima = sesiones.get(sesiones.size() - 1);
+                            if (ultima.getFin() == null) {
+                                ultima.cerrarSesion();
+                            }
+                        }
+                        usrEntityManager.getTransaction().begin();
+                        usrEntityManager.merge(currentUser);
+                        usrEntityManager.getTransaction().commit();
                         break;
                 }
             }
@@ -680,6 +697,19 @@ public class Main {
 
                         System.out.println("Cerrando sesion...");
                         currentUser.actualizarCategoria();
+
+                        //NUEVO: Guardar (mergear) los cambios de sesiones del usuario en la base de datos
+                        //Cierra la ultima sesion y la persiste
+                        List<Sesion> sesiones = currentUser.getSesiones();
+                        if (sesiones != null && !sesiones.isEmpty()) {
+                            Sesion ultima = sesiones.get(sesiones.size() - 1);
+                            if (ultima.getFin() == null) {
+                                ultima.cerrarSesion();
+                            }
+                        }
+                        usrEntityManager.getTransaction().begin();
+                        usrEntityManager.merge(currentUser);
+                        usrEntityManager.getTransaction().commit();
                         break;
                 }
             }
