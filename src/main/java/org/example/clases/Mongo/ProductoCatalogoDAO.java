@@ -19,13 +19,15 @@ public class ProductoCatalogoDAO {
     }
 
     //Inserta el producto en la base
-    public void insertarProducto(Producto prod) {
+    public void insertarProducto(Producto prod, String multimedia) {
         Document doc = new Document("nombre", prod.getNombre())
                 .append("descripcion", prod.getDescripcion())
                 .append("precio", prod.getPrecio())
                 .append("cantidad", prod.getCantidad())
                 .append("comentarios", prod.getComentarios())
+                .append("multimedia", multimedia)
                 .append("historialCambios", List.of());
+
 
         coleccion.insertOne(doc);
     }

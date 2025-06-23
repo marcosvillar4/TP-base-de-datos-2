@@ -17,7 +17,6 @@ import org.example.clases.Mongo.ProductoCatalogoService;
 import org.example.clases.Pedido.PedidoManager;
 import org.example.clases.Producto.Producto;
 import org.example.clases.Usuario.*;
-import org.example.clases.Pedido.Pedido;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.logging.Level;
@@ -230,15 +229,13 @@ public class Main {
                         System.out.println("Cantidad del Producto: ");
                         int cantidad = sc.nextInt();
                         sc.nextLine(); //Limpia el buffer
-                        /*
                         System.out.println("Ingrese el URL de la foto/video del producto:");
                         String url = sc.nextLine();
                         System.out.println("Ingrese algún comentario del producto:");
                         String comentario = sc.nextLine();
-                        */
 
-                        Producto producto = new Producto(nombre, descripcion, precio, cantidad);
-                        productoCatalogoDAO.insertarProducto(producto);
+                        Producto producto = new Producto(nombre, descripcion, precio, cantidad, comentario);
+                        productoCatalogoDAO.insertarProducto(producto, url);
 
 
 
@@ -345,16 +342,39 @@ public class Main {
 
                         String idUsuarioFacturas = sc.nextLine();
 
-                        TypedQuery<Usuario> FacturasFindQuery = usrEntityManager.createQuery("SELECT u FROM Usuario u WHERE u.id =:idUsuario", Usuario.class);
+                        /*TypedQuery<Usuario> FacturasFindQuery = usrEntityManager.createQuery("SELECT u FROM Usuario u WHERE u.id =:idUsuario", Usuario.class);
                         List<Usuario> usuarioFactura = FacturasFindQuery.setParameter("idUsuario",idUsuarioFacturas).getResultList();
 
                         if (!usuarioFactura.isEmpty()){
                             pedidoManager.listarFacturas(idUsuarioFacturas);
                         } else {
                             System.out.println("ID del usuario no encontrado.");
+                        }*/
+
+                        List<Factura> facturasListar = pedidoManager.listarFacturas(idUsuarioFacturas);
+
+                        if (!facturasListar.isEmpty()) {
+                            System.out.println("_________________________________");
+                            System.out.println("FACTURAS DE: " + currentUser.getNombre());
+                            System.out.println("DNI: " +  currentUser.getDni());
+
+                            for (Factura f : facturasListar) {
+                                System.out.println("---------------------");
+                                System.out.println("ID FACTURA: " + f.getId());
+                                System.out.println("Fecha: " + f.getPedido().getFecha());
+                                System.out.println("Subtotal: $" + f.getSubtotal());
+                                System.out.println("Impuestos: $" + f.getImpuestos());
+                                System.out.println("Total: $" + f.getTotal());
+                                System.out.println("Estado: " + f.getEstado());
+                                System.out.println("ID Pedido origen: " + f.getPedido().getIdPedido());
+                            }
+                        } else{
+                            System.out.println("El usuario con ID " + currentUser.getId() + " no tiene facturas.");
                         }
 
                         break;
+
+
 
                     case 7:
 
@@ -429,7 +449,7 @@ public class Main {
                 System.out.println("2. Agregar item al carrito");
                 System.out.println("3. Eliminar item del carrito");
                 System.out.println("4. Ver carrito");
-                System.out.println("5. Modificar la cantidad de un producto del carrito");          // MODIFICAR
+                System.out.println("5. Modificar la cantidad de un producto del carrito");
                 System.out.println("6. Deshacer el último cambio del carrito");
                 System.out.println("7. Vaciar Carrito");
                 System.out.println("8. Confirmar carrito"); //Falta

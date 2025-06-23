@@ -8,14 +8,15 @@ public class Producto {
     private String descripcion;
     private double precio;
     private int cantidad;
-    private List<String> comentarios;
+    private String comentarios;
     private List<CambioProducto> historialCambios;
 
-    public Producto(String nombre, String descripcion, double precio, int cantidad) {
+    public Producto(String nombre, String descripcion, double precio, int cantidad, String comentarios) {
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.precio = precio;
         this.cantidad = cantidad;
+        this.comentarios = comentarios;
     }
 
     public String getId() {
@@ -58,11 +59,11 @@ public class Producto {
         this.cantidad = cantidad;
     }
 
-    public List<String> getComentarios() {
+    public String getComentarios() {
         return comentarios;
     }
 
-    public void setComentarios(List<String> comentarios) {
+    public void setComentarios(String comentarios) {
         this.comentarios = comentarios;
     }
 
