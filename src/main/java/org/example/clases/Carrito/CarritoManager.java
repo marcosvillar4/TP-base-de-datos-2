@@ -8,8 +8,8 @@ public class CarritoManager {
     private final Jedis redis;
     private final Gson gson = new Gson();
 
-    public CarritoManager(){
-        this.redis = new Jedis("localhost", 6379);
+    public CarritoManager(String host, int port){
+        this.redis = new Jedis(host, port);
     }
 
     public Carrito obtenerCarrito(String idUsuario){

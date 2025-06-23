@@ -33,9 +33,14 @@ public class Main {
                         "objectdb/db/users.odb");
         EntityManager usrEntityManager = usrManagerFactory.createEntityManager();
 
+        EntityManagerFactory pedidoManagerFactory =
+                Persistence.createEntityManagerFactory(
+                        "objectdb/db/pedidos.odb");
+        EntityManager pedidoEntityManager = usrManagerFactory.createEntityManager();
+
         Usuario currentUser = null;
 
-        CarritoManager carritoManager = new CarritoManager();
+        CarritoManager carritoManager = new CarritoManager("192.168.1.25", 6379);
         PedidoManager pedidoManager = new PedidoManager(usrEntityManager, carritoManager);
 
         ProductoCatalogoDAO productoCatalogoDAO = new ProductoCatalogoDAO(MongoManager.getDatabase());
@@ -132,8 +137,7 @@ public class Main {
                         usrEntityManager.persist(u);
                         usrEntityManager.getTransaction().commit();
 
-                        usrEntityManager.close();
-                        usrManagerFactory.close();
+
                     }
                     break;
 
@@ -390,7 +394,7 @@ public class Main {
                 System.out.println("2. Agregar item al carrito");
                 System.out.println("3. Eliminar item del carrito");
                 System.out.println("4. Ver carrito");
-                System.out.println("5. Modificar la cantidad de un producto del carrito");
+                System.out.println("5. Modificar la cantidad de un producto del carrito");          // MODIFICAR
                 System.out.println("6. Deshacer el último cambio del carrito");
                 System.out.println("7. Vaciar Carrito");
                 System.out.println("8. Confirmar carrito"); //Falta
@@ -480,7 +484,7 @@ public class Main {
                                 System.out.println("Nombre: " + document.get("nombre").toString());
                                 System.out.println("Descripcion: " + document.get("descripcion").toString());
                                 System.out.println("Precio: " + document.get("precio"));
-                                System.out.println("Stock: " + document.get("cantidad"));
+                                System.out.println("Cantidad En Carrito: " + carrito.getCarrito().get(document.get("_id").toString()));
                             }
                         } else {
                             System.out.println("El carrito está vacío.");
@@ -551,6 +555,7 @@ public class Main {
                             //Vacia el buffer del snapshot del carrito
                             carritoManager.snapshotCarrito(currentUser.getId(), null);
                         }
+                        break;
 
                     case 9:
 
@@ -560,25 +565,29 @@ public class Main {
                             System.out.println("ID del pago a realizar de las facturas a realizar, FORMATO: 1,2,3: ");
                             String idFacturas = sc.nextLine();
 
-                            String[] ids = idFacturas.split(",");
+                            String[] ids = idFacturas.split("\\,");
 
-                            ArrayList<Factura> facturasSelecionadas = new ArrayList<>();
+                            System.out.println(Arrays.toString(ids));
+
+                            LinkedList<Factura> facturasSelecionadas = new LinkedList<>();
+
+
+
 
                             if (ids.length != 0)
                                 for (String id : ids) {
                                     for (Factura factura : facturas) {
-                                        if (Objects.equals(factura.getId(),id)) {
+                                        if (Objects.equals(factura.getId(), id)) {
                                             facturasSelecionadas.add(factura);
-                                        } else {
-                                            System.out.println("No se encontro factura con id: " + id);
                                         }
-
                                     }
 
                                 }
                             else {
                                 System.out.println("Usuario no debe facturas");
                             }
+
+                            System.out.println(facturasSelecionadas);
 
                             int medioPago = 0;
                             MedioPago medio = null;
@@ -608,7 +617,7 @@ public class Main {
 
                             String operador = sc.nextLine();
 
-                            pedidoManager.registrarPago(facturasSelecionadas, medio, operador);
+                            pedidoManager.registrarPago(facturasSelecionadas, medio, operador, currentUser);
 
                            //Pago pago = new Pago(String.valueOf(pedidoManager.listarPagos(currentUser.getId()).size() + 1), LocalDateTime.now(), monto, medio, facturasSelecionadas);
 
@@ -621,6 +630,7 @@ public class Main {
                     case 10:
 
                         List<Factura> facturasListar = pedidoManager.listarFacturas(currentUser.getId());
+
                         if (!facturasListar.isEmpty()) {
                             System.out.println("_________________________________");
                             System.out.println("FACTURAS DE: " + currentUser.getNombre());
@@ -673,7 +683,8 @@ public class Main {
                         break;
                 }
             }
-
+            usrEntityManager.close();
+            usrManagerFactory.close();
         }
     }
 }

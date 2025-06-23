@@ -9,7 +9,6 @@ import org.example.clases.Pedido.Pedido;
 public class Factura {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String id;
 
     @OneToOne
@@ -19,8 +18,7 @@ public class Factura {
     private double total;
     private double impuestos;
 
-    @OneToMany
-    private List<Pago> pagos = new ArrayList<>();
+
 
     @Enumerated(EnumType.STRING)
     private EstadoFactura estado;
@@ -50,12 +48,6 @@ public class Factura {
     public void setImpuestos(double impuestos) {
         this.impuestos = impuestos;
     }
-    public List<Pago> getPagos() {
-        return pagos;
-    }
-    public void setPagos(List<Pago> pagos) {
-        this.pagos = pagos;
-    }
     public EstadoFactura getEstado() {
         return estado;
     }
@@ -63,4 +55,8 @@ public class Factura {
         this.estado = estado;
     }
     public String getId(){ return id;}
+
+    public void setId(String id) {
+        this.id = id;
+    }
 }

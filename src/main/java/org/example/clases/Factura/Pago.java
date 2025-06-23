@@ -8,7 +8,6 @@ import org.example.clases.Enums.MedioPago;
 @Entity
 public class Pago {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String id;
     private LocalDateTime fecha;
     private double monto;

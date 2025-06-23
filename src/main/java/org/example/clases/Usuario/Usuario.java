@@ -4,8 +4,11 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import org.example.clases.Enums.CategoriaUsuario;
+import org.example.clases.Factura.Factura;
+import org.example.clases.Factura.Pago;
 import org.example.clases.Pedido.Pedido;
 
+import javax.annotation.processing.Generated;
 import java.io.Serializable;
 import java.util.*;
 import java.time.LocalDate;
@@ -24,10 +27,13 @@ public class Usuario implements Serializable {
     private String direccion;
 
     @OneToMany
-    private List<Pedido> pedidos;
+    private List<Factura> facturas;
 
     @OneToMany
     private List<Sesion> sesiones;
+
+    @OneToMany
+    private List<Pago> pagos;
 
 
     private CategoriaUsuario categoria;
@@ -39,6 +45,8 @@ public class Usuario implements Serializable {
         this.passwd = passwd;
         this.nombre = nombre;
         this.direccion = direccion;
+        this.facturas = new LinkedList<>();
+        this.pagos = new LinkedList<>();
     }
 
     public Usuario() {
@@ -68,12 +76,12 @@ public class Usuario implements Serializable {
         this.direccion = direccion;
     }
 
-    public List<Pedido> getPedidos() {
-        return pedidos;
+    public List<Factura> getFacturas() {
+        return facturas;
     }
 
-    public void setPedidos(LinkedList<Pedido> pedidos) {
-        this.pedidos = pedidos;
+    public void setFacturas(List<Factura> facturas) {
+        this.facturas = facturas;
     }
 
     public CategoriaUsuario getCategoria() {
@@ -129,9 +137,6 @@ public class Usuario implements Serializable {
         return sesiones;
     }
 
-    public void setPedidos(List<Pedido> pedidos) {
-        this.pedidos = pedidos;
-    }
 
     public void setSesiones(List<Sesion> sesiones) {
         this.sesiones = sesiones;
@@ -139,5 +144,21 @@ public class Usuario implements Serializable {
 
     public String getCondicionIVA(){
         return condicionIva;
+    }
+
+    public List<Pago> getPagos() {
+        return pagos;
+    }
+
+    public void setPagos(List<Pago> pagos) {
+        this.pagos = pagos;
+    }
+
+    public String getCondicionIva() {
+        return condicionIva;
+    }
+
+    public void setCondicionIva(String condicionIva) {
+        this.condicionIva = condicionIva;
     }
 }

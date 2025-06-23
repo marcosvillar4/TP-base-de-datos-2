@@ -75,9 +75,10 @@ public class PedidoManager {
     // Listado completo de facturas del usuario
     public List<Factura> listarFacturas(String idUsuario) {
         String jpql = """
-                SELECT f FROM Factura f
-                WHERE f.pedido.usuario.id = :idUsuario
+                SELECT f FROM Usuario u JOIN u.facturas f
+                                WHERE u.id=:idUsuario
                 """;
+
 
         return em.createQuery(jpql, Factura.class)
                 .setParameter("idUsuario", idUsuario)
@@ -109,20 +110,25 @@ public class PedidoManager {
         pedido.setImpuestos(impuestos);
         pedido.setTotal(total);
 
+        facturarPedido(pedido, usuario);
+
         em.getTransaction().begin();
-        em.persist(pedido);
+        em.persist(usuario);
         em.getTransaction().commit();
+
+
     }
 
     // Genera y persiste una factura para un pedido
-    public Factura facturarPedido(Pedido pedido) {
+    private Factura facturarPedido(Pedido pedido, Usuario currentUser) {
         Factura factura = new Factura();
         factura.setPedido(pedido);
         factura.setSubtotal(pedido.getSubtotal());
         factura.setImpuestos(pedido.getImpuestos());
         factura.setTotal(pedido.getTotal());
         factura.setEstado(EstadoFactura.PENDIENTE);
-        factura.setPagos(new ArrayList<>());
+        factura.setId(String.valueOf(currentUser.getFacturas().size() + 1));
+        currentUser.getFacturas().add(factura);
 
         em.getTransaction().begin();
         em.persist(factura);
@@ -132,7 +138,7 @@ public class PedidoManager {
     }
 
     // Registra un pago por una lista de facturas
-    public Pago registrarPago(List<Factura> facturas, MedioPago medioPago, String operador) {
+    public Pago registrarPago(List<Factura> facturas, MedioPago medioPago, String operador, Usuario currentUser) {
         double montoTotal = facturas.stream().mapToDouble(Factura::getTotal).sum();
 
         Pago pago = new Pago();
@@ -141,14 +147,19 @@ public class PedidoManager {
         pago.setMedioPago(medioPago);
         pago.setOperador(operador);
         pago.setFacturasAplicadas(facturas);
-
         em.getTransaction().begin();
-        em.persist(pago);
+
         for (Factura f : facturas) {
-            f.getPagos().add(pago);
             f.setEstado(EstadoFactura.PAGADA);
-            em.merge(f);
+            //pago.getFacturasAplicadas().add(f);
+            //em.persist(f);
+
         }
+        //em.persist(pago.getFacturasAplicadas());
+        currentUser.getPagos().add(pago);
+
+
+        em.persist(pago);
         em.getTransaction().commit();
 
         return pago;
