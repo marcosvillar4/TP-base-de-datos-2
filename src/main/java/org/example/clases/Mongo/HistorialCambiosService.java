@@ -1,14 +1,10 @@
 package org.example.clases.Mongo;
 
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoCursor;
-import com.sun.jdi.ArrayReference;
 import org.bson.Document;
 import org.bson.types.ObjectId;
-
 import java.util.*;
 import java.time.LocalDateTime;
-
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.push;
 

@@ -1,7 +1,5 @@
 package org.example.clases.Producto;
 
-import java.util.*;
-
 public class Producto {
     private String id;
     private String nombre;
@@ -9,7 +7,6 @@ public class Producto {
     private double precio;
     private int cantidad;
     private String comentarios;
-    private List<CambioProducto> historialCambios;
 
     public Producto(String nombre, String descripcion, double precio, int cantidad, String comentarios) {
         this.nombre = nombre;
@@ -65,13 +62,5 @@ public class Producto {
 
     public void setComentarios(String comentarios) {
         this.comentarios = comentarios;
-    }
-
-    public List<CambioProducto> getHistorialCambios() {
-        return historialCambios;
-    }
-
-    public void setHistorialCambios(List<CambioProducto> historialCambios) {
-        this.historialCambios = historialCambios;
     }
 }

@@ -1,6 +1,5 @@
 package org.example.clases.Factura;
 
-import java.util.*;
 import jakarta.persistence.*;
 import org.example.clases.Enums.EstadoFactura;
 import org.example.clases.Pedido.Pedido;
@@ -55,7 +54,6 @@ public class Factura {
         this.estado = estado;
     }
     public String getId(){ return id;}
-
     public void setId(String id) {
         this.id = id;
     }

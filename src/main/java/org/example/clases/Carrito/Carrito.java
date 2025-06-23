@@ -1,33 +1,19 @@
 package org.example.clases.Carrito;
 
-import org.example.clases.Enums.EstadoCarrito;
-
 import java.util.*;
-
-
 
 public class Carrito {
 
     private final Map<String, Integer> carrito;
-    //private LinkedList<ItemCarrito> carrito;
-    private EstadoCarrito estado;
 
     public Carrito() {
         carrito = new HashMap<>();
-        estado = EstadoCarrito.PENDIENTE;
     }
 
     public Map<String, Integer> getCarrito() {
         return carrito;
     }
 
-    public EstadoCarrito getEstado() {
-        return estado;
-    }
-
-    public void setEstado(EstadoCarrito estado) {
-        this.estado = estado;
-    }
 
     public void agregarItem(String producto, int cantidad) {
         if (carrito.containsKey(producto)){

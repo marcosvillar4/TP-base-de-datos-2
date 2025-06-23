@@ -7,12 +7,8 @@ import org.example.clases.Enums.CategoriaUsuario;
 import jakarta.persistence.CascadeType;
 import org.example.clases.Factura.Factura;
 import org.example.clases.Factura.Pago;
-import org.example.clases.Pedido.Pedido;
-
-import javax.annotation.processing.Generated;
 import java.io.Serializable;
 import java.util.*;
-import java.time.LocalDate;
 
 
 

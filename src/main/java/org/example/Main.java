@@ -18,15 +18,9 @@ import org.example.clases.Pedido.PedidoManager;
 import org.example.clases.Producto.Producto;
 import org.example.clases.Usuario.Sesion;
 import org.example.clases.Usuario.Usuario;
-
 import org.bson.types.ObjectId;
-import org.slf4j.LoggerFactory;
-
-import java.sql.SQLOutput;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 
@@ -71,7 +65,6 @@ public class Main {
             opcion = sc.nextInt();
             sc.nextLine(); //Limpia el buffer
 
-
             switch (opcion) {
                 case 1:
 
@@ -106,9 +99,8 @@ public class Main {
                         usrEntityManager.persist(currentUser);
                         usrEntityManager.getTransaction().commit();
                     }
+
                     break;
-
-
 
                 case 2:
 
@@ -173,6 +165,7 @@ public class Main {
 
 
                     }
+
                     break;
 
                 case 3:
@@ -181,9 +174,6 @@ public class Main {
                     usrManagerFactory.close();
 
                     break;
-
-
-
             }
         }
 
@@ -417,8 +407,6 @@ public class Main {
                         }
                         break;
 
-
-
                     case 7:
 
                         System.out.println("Ingrese el ID del usuario:");
@@ -472,6 +460,7 @@ public class Main {
                             System.out.println("Multimedia: " + document.get("multimedia"));
                             System.out.println("Comentarios: " + document.get("comentarios"));
                         }
+
                         break;
 
                     case 9:
@@ -480,7 +469,6 @@ public class Main {
 
                         currentUser.actualizarCategoria();
 
-                        //NUEVO: Guardar (mergear) los cambios de sesiones del usuario en la base de datos
                         //Cierra la ultima sesion y la persiste
                         List<Sesion> sesiones = currentUser.getSesiones();
                         if (sesiones != null && !sesiones.isEmpty()) {
@@ -492,11 +480,11 @@ public class Main {
                         usrEntityManager.getTransaction().begin();
                         usrEntityManager.merge(currentUser);
                         usrEntityManager.getTransaction().commit();
+
                         break;
                 }
             }
-        }
-        else {
+        } else {
 
             int opcion2 = 0;
 
@@ -543,6 +531,7 @@ public class Main {
                             System.out.println("Multimedia: " + document.get("multimedia"));
                             System.out.println("Comentarios: " + document.get("comentarios"));
                         }
+
                         break;
 
                     case 2:
@@ -557,6 +546,7 @@ public class Main {
                             sc.nextLine(); //Limpia el buffer
                             if (productoCatalogoDAO.existeProducto(idProductoAgregar)) {
                                 if (Integer.parseInt(productoCatalogoDAO.getProductoById(idProductoAgregar).get("cantidad").toString()) >= cantidadAgregar) {
+
                                     // Guarda snapshot, agrega item y guarda el carrito
                                     carritoManager.snapshotCarrito(currentUser.getId(), carrito);
                                     carrito.agregarItem(idProductoAgregar, cantidadAgregar);
@@ -571,6 +561,7 @@ public class Main {
                         } else{
                             System.out.println("ID inválido. Debe tener 24 caracteres hexadecimales");
                         }
+
                         break;
 
                     case 3:
@@ -666,7 +657,6 @@ public class Main {
 
                         if (!carrito.estaVacio()) {
 
-
                             //Guarda snapshot para deshacer y guarda el carrito
                             carritoManager.snapshotCarrito(currentUser.getId(), carrito);
                             carrito.vaciarCarrito();
@@ -699,8 +689,6 @@ public class Main {
 
                         List<Factura> facturas = pedidoManager.listarFacturas(currentUser.getId());
 
-
-
                         if (!facturas.isEmpty()) {
                             boolean checkFacturasPendientes = false;
                             System.out.println("Facturas Pendientes: ");
@@ -710,7 +698,6 @@ public class Main {
                                     System.out.println("ID: " + factura.getId() + " Total: " + factura.getTotal());
                                 }
                             }
-
 
                             if (checkFacturasPendientes) {
                                 System.out.println("ID del pago a realizar de las facturas a realizar, FORMATO: 1,2,3: ");
@@ -759,11 +746,11 @@ public class Main {
                                         medioPago = sc.nextInt();
                                         sc.nextLine(); //Limpia el buffer
                                         medio = switch (medioPago) {
-                                            case 1 -> medio = MedioPago.EFECTIVO;
-                                            case 2 -> medio = MedioPago.TRANSFERENCIA;
-                                            case 3 -> medio = MedioPago.TARJETA;
-                                            case 4 -> medio = MedioPago.EN_PUNTO_RETIRO;
-                                            case 5 -> medio = MedioPago.CTA_CTE;
+                                            case 1 -> MedioPago.EFECTIVO;
+                                            case 2 -> MedioPago.TRANSFERENCIA;
+                                            case 3 -> MedioPago.TARJETA;
+                                            case 4 -> MedioPago.EN_PUNTO_RETIRO;
+                                            case 5 -> MedioPago.CTA_CTE;
                                             default -> null;
                                         };
                                     }
@@ -823,6 +810,7 @@ public class Main {
                         } else{
                             System.out.println("El usuario con ID " + currentUser.getId() + " no tiene facturas.");
                         }
+
                         break;
 
                     case 11:
@@ -848,6 +836,7 @@ public class Main {
                          } else{
                              System.out.println("El usuario con ID " + currentUser.getId() + " no tiene pagos registrados.");
                          }
+
                         break;
 
                     case 12:
@@ -855,7 +844,6 @@ public class Main {
                         System.out.println("Cerrando sesion...");
                         currentUser.actualizarCategoria();
 
-                        //NUEVO: Guardar (mergear) los cambios de sesiones del usuario en la base de datos
                         //Cierra la ultima sesion y la persiste
                         List<Sesion> sesiones = currentUser.getSesiones();
                         if (sesiones != null && !sesiones.isEmpty()) {
@@ -864,14 +852,18 @@ public class Main {
                                 ultima.cerrarSesion();
                             }
                         }
+
                         usrEntityManager.getTransaction().begin();
                         usrEntityManager.persist(currentUser);
                         usrEntityManager.getTransaction().commit();
+
                         break;
                 }
             }
+
             usrEntityManager.close();
             usrManagerFactory.close();
+            MongoManager.close();
         }
     }
 }

@@ -1,13 +1,9 @@
 package org.example.clases.Pedido;
 
 import jakarta.persistence.*;
-
 import java.time.*;
-import java.util.HashMap;
 import java.util.Map;
-
 import org.example.clases.Carrito.Carrito;
-import org.example.clases.Usuario.Usuario;
 
 @Entity
 public class Pedido {

@@ -52,65 +52,6 @@ public class PedidoManager {
                 .getResultList();
     }
 
-    // Genera un pedido a partir del carrito del usuario y lo persiste
-    /*
-    public void generarYGuardarPedido(String idUsuario, Usuario usuario) {
-        Carrito carrito = carritoManager.obtenerCarrito(idUsuario);
-
-
-        Pedido pedido = new Pedido();
-
-        pedido.setCarrito(carrito);
-        pedido.setFecha(LocalDateTime.now());
-
-        ProductoCatalogoDAO productoCatalogoDAO = new ProductoCatalogoDAO(MongoManager.getDatabase());
-
-        double subtotal = 0;
-        double iva = 0;
-        double total = 0;
-
-        ProductoCatalogoService productoCatalogoService = new ProductoCatalogoService(MongoManager.getDatabase().getCollection("productos"));
-        for (String s : carrito.getCarrito().keySet()) {
-            subtotal = subtotal + carrito.getCarrito().get(s) * Double.parseDouble(productoCatalogoDAO.getProductoById(s).get("precio").toString());
-            boolean ok = productoCatalogoService.descontarStock(s, carrito.getCarrito().get(s), usuario.getId());
-            if (!ok) {
-                System.out.println("No hay suficiente stock para el producto con id: " + s);
-            }
-        }
-        pedido.setCarritoFinal(carrito.getCarrito());
-
-        switch(usuario.getCondicionIVA()){
-            case "Responsable inscripto":
-                iva = subtotal * 0.21;
-                total = subtotal + iva;
-                break;
-            case "Consumidor final":
-            case "Monotributista":
-                //El precio total ya incluye el IVA, se calcula al reves
-                // Si el subtotal es neto, para mostrtar el total con iva:
-                iva = subtotal * 0.21;
-                total = subtotal + iva; // El total ya incluye iva
-                iva = 0;
-                break;
-            case "Exento":
-                total = subtotal;
-                iva = 0;
-                break;
-        }
-
-        pedido.setSubtotal(subtotal);
-        pedido.setImpuestos(iva);
-        pedido.setTotal(total);
-
-        facturarPedido(pedido, usuario);
-
-        em.getTransaction().begin();
-        em.persist(usuario);
-        em.getTransaction().commit();
-
-
-    }*/
-
     public boolean generarYGuardarPedido(String idUsuario, Usuario usuario) {
         Carrito carrito = carritoManager.obtenerCarrito(idUsuario);
 

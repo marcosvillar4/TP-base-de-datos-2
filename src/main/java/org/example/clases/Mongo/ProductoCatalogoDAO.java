@@ -6,11 +6,9 @@ import com.mongodb.client.result.DeleteResult;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.example.clases.Producto.Producto;
-
 import java.util.*;
-import java.time.*;
 import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Updates.*;
+
 public class ProductoCatalogoDAO {
     private final MongoCollection<Document> coleccion;
 
