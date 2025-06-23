@@ -13,9 +13,6 @@ public class Pedido {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int idPedido;
 
-    @ManyToOne
-    private Usuario usuario;
-
     @Transient
     private Carrito carrito;
 
@@ -33,12 +30,7 @@ public class Pedido {
     public void setFecha(LocalDateTime fecha) {
         this.fecha = fecha;
     }
-    public Usuario getUsuario() {
-        return usuario;
-    }
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
-    }
+
     public int getIdPedido() {return idPedido;}
     public void setIdPedido(int idPedido) {this.idPedido = idPedido;}
     public double getSubtotal() {
