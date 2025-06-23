@@ -55,13 +55,33 @@ public class ProductoCatalogoService {
             actualizarCampo(id, "comentarios", nuevoComentario, viejo, operador);
         }
 
-    public void actualizarCantidad(String id, int nuevaCantidad, String operador){
-        Document prod = getProducto(id);
-        if(prod != null && nuevaCantidad != 0 && !operador.isBlank()){
-            int viejo = Integer.parseInt(prod.getString("cantidad"));
-            actualizarCampo(id, "cantidad", String.valueOf(nuevaCantidad), viejo, operador);
+        public void actualizarCantidad(String id, int nuevaCantidad, String operador){
+            Document prod = getProducto(id);
+            if(prod != null && nuevaCantidad != 0 && !operador.isBlank()){
+                int viejo = prod.getInteger("cantidad");
+                actualizarCampo(id, "cantidad", nuevaCantidad, viejo, operador);
+            }
         }
-    }
+
+        public boolean descontarStock(String id, int cantidad, String operador){
+            Document prod = getProducto(id);
+            if (prod != null && cantidad > 0 && !operador.isBlank()) {
+                int viejo = prod.getInteger("cantidad");
+                // Usamos $inc para restar la cantidad
+                var res = coleccion.updateOne(
+                        new Document("_id", new ObjectId(id))
+                                .append("cantidad", new Document("$gte", cantidad)), // Evita stock negativo
+                        new Document("$inc", new Document("cantidad", -cantidad))
+                );
+                if (res.getModifiedCount() > 0) {
+                    historial.registrarCambio(id, "cantidad", viejo, viejo-cantidad, operador);
+                    return true; // Éxito
+                } else {
+                    return false; // No había suficiente stock
+                }
+            }
+            return false;
+        }
 
         public List<Document> getHistorialCambios(String idProd){
             return historial.obtenerHistorialDelProducto(idProd);
@@ -75,5 +95,7 @@ public class ProductoCatalogoService {
         private Document getProducto(String id) {
             return coleccion.find(eq("_id", new ObjectId(id))).first();
         }
+
+
 }
 

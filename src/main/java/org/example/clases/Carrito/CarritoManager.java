@@ -41,4 +41,9 @@ public class CarritoManager {
         String lastVersion = redis.lpop(key);
         return lastVersion != null ? gson.fromJson(lastVersion, Carrito.class) : new Carrito();
     }
+
+    public void eliminarSnapshots(String idUsuario){
+        String key = PREFIX+"snapshots:"+idUsuario;
+        redis.del(key);
+    }
 }

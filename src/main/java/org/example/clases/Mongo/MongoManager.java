@@ -17,10 +17,10 @@ public class MongoManager {
 
     public static MongoDatabase getDatabase() {
         if (database == null) {
-            logger.info("Conectando a MongoDB en {}", URI);
+            //logger.info("Conectando a MongoDB en {}", URI);
             client = MongoClients.create(URI);
             database = client.getDatabase(DB_NAME);
-            logger.info("Conectado exitosamente a la base de datos '{}'", DB_NAME);
+            //logger.info("Conectado exitosamente a la base de datos '{}'", DB_NAME);
 
         }
         return database;
@@ -29,7 +29,7 @@ public class MongoManager {
     public static void close() {
         if (client != null) {
             client.close();
-            logger.info("Conexión a MongoDB cerrada");
+            //logger.info("Conexión a MongoDB cerrada");
         }
     }
 }

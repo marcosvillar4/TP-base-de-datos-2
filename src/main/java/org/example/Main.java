@@ -19,6 +19,8 @@ import org.example.clases.Producto.Producto;
 import org.example.clases.Usuario.Sesion;
 import org.example.clases.Usuario.Usuario;
 
+import org.bson.types.ObjectId;
+
 import java.sql.SQLOutput;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -101,10 +103,6 @@ public class Main {
                         Sesion sesion = new Sesion(LocalDateTime.now());
                         currentUser.getSesiones().add(sesion);
 
-
-                        //NUEVO: Guardar (mergear) los cambios de sesiones del usuario en la base de datos
-
-                        //usrEntityManager.persist(sesion);
                         usrEntityManager.persist(currentUser);
                         usrEntityManager.getTransaction().commit();
                     }
@@ -140,8 +138,7 @@ public class Main {
                         case 1 -> "Responsable inscripto";
                         case 2 -> "Consumidor final";
                         case 3 -> "Monotributista";
-                        case 4 -> "Exento";
-                        default -> null;
+                        default -> "Exento";
                     };
 
                     TypedQuery<Usuario> query = usrEntityManager.createQuery("SELECT u FROM Usuario u", Usuario.class);
@@ -226,6 +223,7 @@ public class Main {
                                 System.out.println("DNI del usuario: " + usuario.getDni());
                                 System.out.println("Dirección del usuario: " + usuario.getDireccion());
                                 System.out.println("Tipo de usuario: " + usuario.getCategoria());
+                                System.out.println("Condicion ante el IVA: " +  usuario.getCondicionIVA());
                             }
                         } else {
                             System.out.println("ID de usuario no encontrado.");
@@ -274,6 +272,7 @@ public class Main {
                             System.out.println("3. Editar el precio");
                             System.out.println("4. Editar la foto/video");
                             System.out.println("5. Editar el comentario");
+                            System.out.println("6. Editar la cantidad en stock");
 
                             int opcionEditar = sc.nextInt();
                             sc.nextLine(); //Limpia el buffer
@@ -319,6 +318,15 @@ public class Main {
                                     System.out.println("Ingrese el nombre del operador:");
                                     nombreOperador = sc.nextLine();
                                     productoCatalogoService.actualizarComentarios(idProductoEditar, nuevoComentario, nombreOperador);
+                                    break;
+
+                                case 6:
+                                    System.out.println("Ingrese la nueva cantidad de stock: ");
+                                    int nuevaCantidad = sc.nextInt();
+                                    sc.nextLine();
+                                    System.out.println("Ingrese el nombre del operador: ");
+                                    nombreOperador = sc.nextLine();
+                                    productoCatalogoService.actualizarCantidad(idProductoEditar, nuevaCantidad, nombreOperador);
                                     break;
 
                                 default:
@@ -374,9 +382,19 @@ public class Main {
                                     System.out.println("---------------------");
                                     System.out.println("ID FACTURA: " + f.getId());
                                     System.out.println("Fecha: " + f.getPedido().getFecha());
-                                    System.out.println("Subtotal: $" + f.getSubtotal());
-                                    System.out.println("Impuestos: $" + f.getImpuestos());
-                                    System.out.println("Total: $" + f.getTotal());
+
+                                    //muestra segun el tipo de condicion de iva que tenga una diferente factura
+                                    if (currentUser.getCondicionIVA().equals("Responsable inscripto")) {
+                                        System.out.println("Subtotal: $" + f.getSubtotal());
+                                        System.out.println("IVA: $" + f.getImpuestos());
+                                        System.out.println("Total: $" + f.getTotal());
+                                    } else if (currentUser.getCondicionIVA().equals("Consumidor final") ||
+                                            currentUser.getCondicionIVA().equals("Monotributista")) {
+                                        System.out.println("Total: $" + f.getTotal() + " (IVA incluido)");
+                                    } else if (currentUser.getCondicionIVA().equals("Exento")) {
+                                        System.out.println("Total: $" + f.getTotal() + " (Exento de IVA)");
+                                    }
+
                                     System.out.println("Estado: " + f.getEstado());
                                     System.out.println("ID Pedido origen: " + f.getPedido().getIdPedido());
                                 }
@@ -518,21 +536,25 @@ public class Main {
 
                         System.out.println("ID del producto a agregar: ");
                         String idProductoAgregar = sc.nextLine();
-                        System.out.println("Cantidad: ");
-                        int cantidadAgregar = sc.nextInt();
-                        sc.nextLine(); //Limpia el buffer
-                        if (productoCatalogoDAO.existeProducto(idProductoAgregar)) {
-                            if (Integer.parseInt(productoCatalogoDAO.getProductoById(idProductoAgregar).get("cantidad").toString()) >= cantidadAgregar) {
-                                carrito.agregarItem(idProductoAgregar, cantidadAgregar);
 
-                                //Guarda un snapshot del carrito para deshacer y despues lo guarda
-                                carritoManager.snapshotCarrito(currentUser.getId(), carrito);
-                                carritoManager.guardarCarrito(currentUser.getId(), carrito);
+                        if(ObjectId.isValid(idProductoAgregar)) {
+                            System.out.println("Cantidad: ");
+                            int cantidadAgregar = sc.nextInt();
+                            sc.nextLine(); //Limpia el buffer
+                            if (productoCatalogoDAO.existeProducto(idProductoAgregar)) {
+                                if (Integer.parseInt(productoCatalogoDAO.getProductoById(idProductoAgregar).get("cantidad").toString()) >= cantidadAgregar) {
+                                    // Guarda snapshot, agrega item y guarda el carrito
+                                    carritoManager.snapshotCarrito(currentUser.getId(), carrito);
+                                    carrito.agregarItem(idProductoAgregar, cantidadAgregar);
+                                    carritoManager.guardarCarrito(currentUser.getId(), carrito);
+                                } else {
+                                    System.out.println("No hay suficiente stock disponible");
+                                }
                             } else {
-                                System.out.println("No hay suficiente stock disponible");
+                                System.out.println("Producto no encontrado");
                             }
-                        } else {
-                            System.out.println("Producto no encontrado");
+                        } else{
+                            System.out.println("ID inválido. Debe tener 24 caracteres hexadecimales");
                         }
                         break;
 
@@ -543,10 +565,9 @@ public class Main {
                             String idProductoEliminar = sc.nextLine();
 
                             if (carrito.getCarrito().containsKey(idProductoEliminar)) {
-                                carrito.eliminarItem(idProductoEliminar);
 
-                                // Guarda snapshot del carrito para deshacer y guarda el carrito
                                 carritoManager.snapshotCarrito(currentUser.getId(), carrito);
+                                carrito.eliminarItem(idProductoEliminar);
                                 carritoManager.guardarCarrito(currentUser.getId(), carrito);
 
                                 System.out.println("Producto eliminado del carrito.");
@@ -572,6 +593,8 @@ public class Main {
                                 System.out.println("Descripcion: " + document.get("descripcion").toString());
                                 System.out.println("Precio: " + document.get("precio"));
                                 System.out.println("Cantidad En Carrito: " + carrito.getCarrito().get(document.get("_id").toString()));
+                                System.out.println("Multimedia: " +  document.get("multimedia"));
+                                System.out.println("Comentarios: " + document.get("comentarios"));
                             }
                         } else {
                             System.out.println("El carrito está vacío.");
@@ -594,10 +617,10 @@ public class Main {
                                 int stockDisponible = Integer.parseInt(productoDoc.get("cantidad").toString());
 
                                 if (stockDisponible >= cantidadEditar && cantidadEditar >= 0) {
-                                    carrito.modificarCantidad(idProductoCantidad, cantidadEditar);
 
                                     //Guarda snapshot para deshacer y guarda el carrito
                                     carritoManager.snapshotCarrito(currentUser.getId(), carrito);
+                                    carrito.modificarCantidad(idProductoCantidad, cantidadEditar);
                                     carritoManager.guardarCarrito(currentUser.getId(), carrito);
                                 } else {
                                     if (cantidadEditar < 0) {
@@ -625,10 +648,11 @@ public class Main {
                     case 7:
 
                         if (!carrito.estaVacio()) {
-                            carrito.vaciarCarrito();
+
 
                             //Guarda snapshot para deshacer y guarda el carrito
                             carritoManager.snapshotCarrito(currentUser.getId(), carrito);
+                            carrito.vaciarCarrito();
                             carritoManager.guardarCarrito(currentUser.getId(), carrito);
                             System.out.println("Carrito Eliminado!");
                         } else {
@@ -641,11 +665,13 @@ public class Main {
 
                         if (!carrito.estaVacio()) {
                             System.out.println("Creando pedido...");
-                            pedidoManager.generarYGuardarPedido(currentUser.getId(), currentUser);
-                            carrito.vaciarCarrito();
-                            carritoManager.eliminarCarrito(currentUser.getId());
-                            //Vacia el buffer del snapshot del carrito
-                            carritoManager.snapshotCarrito(currentUser.getId(), null);
+                            boolean check = pedidoManager.generarYGuardarPedido(currentUser.getId(), currentUser);
+                            if(check) {
+                                carrito.vaciarCarrito();
+                                carritoManager.eliminarCarrito(currentUser.getId());
+                                //Vacia el snapshot del carrito
+                                carritoManager.eliminarSnapshots(currentUser.getId());
+                            }
                         } else {
                             System.out.println("El carrito está vacío.");
                         }
@@ -700,7 +726,8 @@ public class Main {
                                 }
 
                                 if (!facturasSelecionadas.isEmpty()) {
-                                    System.out.println("Facturas a pagar: " + facturasSelecionadas.toString().replace('[', ' ').replace(']', ' '));
+                                    System.out.println("Facturas a pagar: ");
+                                    facturasSelecionadas.forEach(f -> System.out.print(f.getId() + " "));
 
                                     int medioPago = 0;
                                     MedioPago medio = null;
@@ -757,9 +784,18 @@ public class Main {
                                 System.out.println("---------------------");
                                 System.out.println("ID FACTURA: " + f.getId());
                                 System.out.println("Fecha: " + f.getPedido().getFecha());
-                                System.out.println("Subtotal: $" + f.getSubtotal());
-                                System.out.println("Impuestos: $" + f.getImpuestos());
-                                System.out.println("Total: $" + f.getTotal());
+
+                                //muestra segun el tipo de condicion de iva que tenga una diferente factura
+                                if (currentUser.getCondicionIVA().equals("Responsable inscripto")) {
+                                    System.out.println("Subtotal: $" + f.getSubtotal());
+                                    System.out.println("IVA: $" + f.getImpuestos());
+                                    System.out.println("Total: $" + f.getTotal());
+                                } else if (currentUser.getCondicionIVA().equals("Consumidor final") ||
+                                        currentUser.getCondicionIVA().equals("Monotributista")) {
+                                    System.out.println("Total: $" + f.getTotal() + " (IVA incluido)");
+                                } else if (currentUser.getCondicionIVA().equals("Exento")) {
+                                    System.out.println("Total: $" + f.getTotal() + " (Exento de IVA)");
+                                }
                                 System.out.println("Estado: " + f.getEstado());
                                 System.out.println("ID Pedido origen: " + f.getPedido().getIdPedido());
                             }
