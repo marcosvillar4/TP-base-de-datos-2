@@ -30,7 +30,7 @@ public class Usuario implements Serializable {
     private List<Factura> facturas;
 
     @OneToMany
-    private List<Sesion> sesiones;
+    private List<Sesion> sesiones = new ArrayList<>();
 
     @OneToMany
     private List<Pago> pagos;
