@@ -467,8 +467,6 @@ public class Main {
 
                         System.out.println("Cerrando sesión...");
 
-                        currentUser.actualizarCategoria();
-
                         //Cierra la ultima sesion y la persiste
                         List<Sesion> sesiones = currentUser.getSesiones();
                         if (sesiones != null && !sesiones.isEmpty()) {
@@ -477,6 +475,9 @@ public class Main {
                                 ultima.cerrarSesion();
                             }
                         }
+
+                        currentUser.actualizarCategoria();
+
                         usrEntityManager.getTransaction().begin();
                         usrEntityManager.merge(currentUser);
                         usrEntityManager.getTransaction().commit();
@@ -842,7 +843,6 @@ public class Main {
                     case 12:
 
                         System.out.println("Cerrando sesion...");
-                        currentUser.actualizarCategoria();
 
                         //Cierra la ultima sesion y la persiste
                         List<Sesion> sesiones = currentUser.getSesiones();
@@ -852,6 +852,8 @@ public class Main {
                                 ultima.cerrarSesion();
                             }
                         }
+
+                        currentUser.actualizarCategoria();
 
                         usrEntityManager.getTransaction().begin();
                         usrEntityManager.persist(currentUser);
