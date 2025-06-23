@@ -39,7 +39,7 @@ public class Usuario implements Serializable {
     private CategoriaUsuario categoria;
     private String condicionIva;
 
-    public Usuario(String id, int dni, String passwd, String nombre, String direccion) {
+    public Usuario(String id, int dni, String passwd, String nombre, String direccion, String condicionIva) {
         this.id = id;
         this.dni = dni;
         this.passwd = passwd;
@@ -47,6 +47,7 @@ public class Usuario implements Serializable {
         this.direccion = direccion;
         this.facturas = new LinkedList<>();
         this.pagos = new LinkedList<>();
+        this.condicionIva = condicionIva;
     }
 
     public Usuario() {

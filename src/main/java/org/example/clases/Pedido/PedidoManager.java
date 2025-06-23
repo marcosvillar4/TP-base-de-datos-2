@@ -76,7 +76,7 @@ public class PedidoManager {
 
 
 
-        double impuestos = subtotal * 0.21; //IVA
+        double impuestos = Objects.equals(usuario.getCondicionIVA(), "Responsable inscripto") ?  subtotal * 0.21 : 0; //IVA
         double total = subtotal + impuestos;
 
         pedido.setSubtotal(subtotal);

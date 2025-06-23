@@ -124,6 +124,24 @@ public class Main {
                     System.out.println("Ingresa la direccion del nuevo usuario");
                     String direccion = sc.nextLine();
 
+                    //IVA
+                    System.out.println("Ingrese la condición del IVA del nuevo usuario: ");
+                    System.out.println("1. Responsable inscripto");
+                    System.out.println("2. Consumidor final");
+                    System.out.println("3. Monotributista");
+                    System.out.println("4. Exento");
+
+                    int condicionIVASwitch = sc.nextInt();
+                    sc.nextLine(); //Limpia el buffer
+
+                    String condicionIVA = switch(condicionIVASwitch){
+                        case 1 -> "Responsable inscripto";
+                        case 2 -> "Consumidor final";
+                        case 3 -> "Monotributista";
+                        case 4 -> "Exento";
+                        default -> null;
+                    };
+
                     TypedQuery<Usuario> query = usrEntityManager.createQuery("SELECT u FROM Usuario u", Usuario.class);
 
                     usuarios = query.getResultList();
@@ -141,7 +159,7 @@ public class Main {
                         System.out.println("Nombre del usuario existe");
                     } else {
                         usrEntityManager.getTransaction().begin();
-                        Usuario u = new Usuario(String.valueOf(usuarios.size()+1), dni, passwd, usr, direccion);
+                        Usuario u = new Usuario(String.valueOf(usuarios.size()+1), dni, passwd, usr, direccion, condicionIVA);
 
                         currentUser = u;
 
