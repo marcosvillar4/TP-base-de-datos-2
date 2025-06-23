@@ -3,6 +3,8 @@ package org.example.clases.Pedido;
 import jakarta.persistence.*;
 
 import java.time.*;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.example.clases.Carrito.Carrito;
 import org.example.clases.Usuario.Usuario;
@@ -21,6 +23,10 @@ public class Pedido {
     private double total;
     private double descuentos;
     private LocalDateTime fecha;
+
+
+    @ElementCollection
+    private Map<String, Integer> carritoFinal;
 
 
     //Getters y setters
@@ -64,4 +70,11 @@ public class Pedido {
         this.carrito = carrito;
     }
 
+    public Map<String, Integer> getCarritoFinal() {
+        return carritoFinal;
+    }
+
+    public void setCarritoFinal(Map<String, Integer> carritoFinal) {
+        this.carritoFinal = carritoFinal;
+    }
 }

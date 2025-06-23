@@ -66,7 +66,9 @@ public class PedidoManager {
 
         for (String s : carrito.getCarrito().keySet()) {
             subtotal = subtotal + carrito.getCarrito().get(s) * Double.parseDouble(productoCatalogoDAO.getProductoById(s).get("precio").toString());
+
         }
+        pedido.setCarritoFinal(carrito.getCarrito());
 
         double impuestos = subtotal * 0.21; //IVA
         double total = subtotal + impuestos;
@@ -130,6 +132,4 @@ public class PedidoManager {
 
         return pago;
     }
-
-    // Pide al usuario qué facturas pendientes desea pagar
 }
