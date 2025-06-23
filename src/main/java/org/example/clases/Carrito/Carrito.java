@@ -8,7 +8,7 @@ import java.util.*;
 
 public class Carrito {
 
-    private Map<String, Integer> carrito;
+    private final Map<String, Integer> carrito;
     //private LinkedList<ItemCarrito> carrito;
     private EstadoCarrito estado;
 
