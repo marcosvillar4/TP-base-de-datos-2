@@ -20,6 +20,7 @@ import org.example.clases.Usuario.Sesion;
 import org.example.clases.Usuario.Usuario;
 
 import org.bson.types.ObjectId;
+import org.slf4j.LoggerFactory;
 
 import java.sql.SQLOutput;
 import java.time.LocalDateTime;
@@ -32,10 +33,9 @@ import java.util.logging.Logger;
 public class Main {
     public static void main(String[] args) {
 
+        //Logger solo errores
+        System.setProperty("org.slf4j.simpleLogger.log.org.mongodb.driver", "error");
 
-
-        Logger mongoLogger = Logger.getLogger( "org.mongodb.driver" );
-        mongoLogger.setLevel(Level.SEVERE);
 
         Scanner sc = new Scanner(System.in);
 
@@ -250,6 +250,7 @@ public class Main {
 
                         Producto producto = new Producto(nombre, descripcion, precio, cantidad, comentario);
                         productoCatalogoDAO.insertarProducto(producto, url);
+                        System.out.println("Producto agregado con éxito!");
                         break;
 
                     case 3:
@@ -265,77 +266,83 @@ public class Main {
 
                         String idProductoEditar =  sc.nextLine();
 
-                        if (productoCatalogoDAO.existeProducto(idProductoEditar)){
-                            System.out.println("Elige el campo a editar:");
-                            System.out.println("1. Editar el nombre");
-                            System.out.println("2. Editar la descripción");
-                            System.out.println("3. Editar el precio");
-                            System.out.println("4. Editar la foto/video");
-                            System.out.println("5. Editar el comentario");
-                            System.out.println("6. Editar la cantidad en stock");
+                        if(ObjectId.isValid(idProductoEditar)) {
+                            if (productoCatalogoDAO.existeProducto(idProductoEditar)) {
+                                System.out.println("Producto: " + productoCatalogoDAO.getProductoById(idProductoEditar).get("nombre"));
+                                System.out.println("Elige el campo a editar:");
+                                System.out.println("1. Editar el nombre");
+                                System.out.println("2. Editar la descripción");
+                                System.out.println("3. Editar el precio");
+                                System.out.println("4. Editar la foto/video");
+                                System.out.println("5. Editar el comentario");
+                                System.out.println("6. Editar la cantidad en stock");
 
-                            int opcionEditar = sc.nextInt();
-                            sc.nextLine(); //Limpia el buffer
-                            String nombreOperador;
+                                int opcionEditar = sc.nextInt();
+                                sc.nextLine(); //Limpia el buffer
+                                String nombreOperador;
 
-                            switch (opcionEditar){
-                                case 1:
-                                    System.out.println("Ingrese el nuevo nombre del producto:");
-                                    String nuevoNombre = sc.nextLine();
-                                    System.out.println("Ingrese el nombre del operador:");
-                                    nombreOperador = sc.nextLine();
-                                    productoCatalogoService.actualizarNombre(idProductoEditar, nuevoNombre, nombreOperador);
-                                    break;
+                                switch (opcionEditar) {
+                                    case 1:
+                                        System.out.println("Ingrese el nuevo nombre del producto:");
+                                        String nuevoNombre = sc.nextLine();
+                                        System.out.println("Ingrese el nombre del operador:");
+                                        nombreOperador = sc.nextLine();
+                                        productoCatalogoService.actualizarNombre(idProductoEditar, nuevoNombre, nombreOperador);
+                                        break;
 
-                                case 2:
-                                    System.out.println("Ingrese la nueva descripcion del producto:");
-                                    String nuevaDescripcion = sc.nextLine();
-                                    System.out.println("Ingrese el nombre del operador:");
-                                    nombreOperador = sc.nextLine();
-                                    productoCatalogoService.actualizarDescripcion(idProductoEditar, nuevaDescripcion, nombreOperador);
-                                    break;
+                                    case 2:
+                                        System.out.println("Ingrese la nueva descripcion del producto:");
+                                        String nuevaDescripcion = sc.nextLine();
+                                        System.out.println("Ingrese el nombre del operador:");
+                                        nombreOperador = sc.nextLine();
+                                        productoCatalogoService.actualizarDescripcion(idProductoEditar, nuevaDescripcion, nombreOperador);
+                                        break;
 
-                                case 3:
-                                    System.out.println("Ingrese el nuevo precio del producto:");
-                                    double nuevoPrecio = sc.nextDouble();
-                                    sc.nextLine(); //Limpia el buffer
-                                    System.out.println("Ingrese el nombre del operador:");
-                                    nombreOperador = sc.nextLine();
-                                    productoCatalogoService.actualizarPrecio(idProductoEditar, nuevoPrecio, nombreOperador);
-                                    break;
+                                    case 3:
+                                        System.out.println("Ingrese el nuevo precio del producto:");
+                                        double nuevoPrecio = sc.nextDouble();
+                                        sc.nextLine(); //Limpia el buffer
+                                        System.out.println("Ingrese el nombre del operador:");
+                                        nombreOperador = sc.nextLine();
+                                        productoCatalogoService.actualizarPrecio(idProductoEditar, nuevoPrecio, nombreOperador);
+                                        break;
 
-                                case 4:
-                                    System.out.println("Ingrese el URL de la nueva foto/video del producto:");
-                                    String nuevoURL = sc.nextLine();
-                                    System.out.println("Ingrese el nombre del operador:");
-                                    nombreOperador = sc.nextLine();
-                                    productoCatalogoService.actualizarFoto(idProductoEditar, nuevoURL, nombreOperador);
-                                    break;
+                                    case 4:
+                                        System.out.println("Ingrese el URL de la nueva foto/video del producto:");
+                                        String nuevoURL = sc.nextLine();
+                                        System.out.println("Ingrese el nombre del operador:");
+                                        nombreOperador = sc.nextLine();
+                                        productoCatalogoService.actualizarFoto(idProductoEditar, nuevoURL, nombreOperador);
+                                        break;
 
-                                case 5:
-                                    System.out.println("Ingrese el nuevo comentario del producto:");
-                                    String nuevoComentario = sc.nextLine();
-                                    System.out.println("Ingrese el nombre del operador:");
-                                    nombreOperador = sc.nextLine();
-                                    productoCatalogoService.actualizarComentarios(idProductoEditar, nuevoComentario, nombreOperador);
-                                    break;
+                                    case 5:
+                                        System.out.println("Ingrese el nuevo comentario del producto:");
+                                        String nuevoComentario = sc.nextLine();
+                                        System.out.println("Ingrese el nombre del operador:");
+                                        nombreOperador = sc.nextLine();
+                                        productoCatalogoService.actualizarComentarios(idProductoEditar, nuevoComentario, nombreOperador);
+                                        break;
 
-                                case 6:
-                                    System.out.println("Ingrese la nueva cantidad de stock: ");
-                                    int nuevaCantidad = sc.nextInt();
-                                    sc.nextLine();
-                                    System.out.println("Ingrese el nombre del operador: ");
-                                    nombreOperador = sc.nextLine();
-                                    productoCatalogoService.actualizarCantidad(idProductoEditar, nuevaCantidad, nombreOperador);
-                                    break;
+                                    case 6:
+                                        System.out.println("Ingrese la nueva cantidad de stock: ");
+                                        int nuevaCantidad = sc.nextInt();
+                                        sc.nextLine();
+                                        System.out.println("Ingrese el nombre del operador: ");
+                                        nombreOperador = sc.nextLine();
+                                        productoCatalogoService.actualizarCantidad(idProductoEditar, nuevaCantidad, nombreOperador);
+                                        break;
 
-                                default:
-                                    System.out.println("El número ingresado no es válido.");
-                                    break;
+                                    default:
+                                        System.out.println("El número ingresado no es válido.");
+                                        break;
+                                }
+                                System.out.println("Producto editado con éxito!");
+                            } else {
+                                System.out.println("El ID del producto no existe.");
                             }
-                        } else {
-                            System.out.println("El ID del producto no existe.");
-                        }
+                        } else{
+                            System.out.println("ID inválido. Debe tener 24 caracteres hexadecimales");
+                            }
 
                         break;
 
@@ -346,16 +353,20 @@ public class Main {
 
                         List<Document> historial = productoCatalogoService.getHistorialCambios(idProducto);
 
-                        for(Document cambio : historial){
-                            Object anterior = cambio.get("valorAnterior");
-                            Object nuevo = cambio.get("valorNuevo");
+                        if (!historial.isEmpty()){
+                            for(Document cambio : historial){
+                                Object anterior = cambio.get("valorAnterior");
+                                Object nuevo = cambio.get("valorNuevo");
 
-                            System.out.println("_____________________________________");
-                            System.out.println("Fecha: " + cambio.getString("fecha"));
-                            System.out.println("Operador: " + cambio.getString("operador"));
-                            System.out.println("Campo modificado: " + cambio.getString("campo"));
-                            System.out.println("Valor anterior: " +  anterior.toString());
-                            System.out.println("Valor final: " +  nuevo.toString());
+                                System.out.println("_____________________________________");
+                                System.out.println("Fecha: " + cambio.getString("fecha"));
+                                System.out.println("Operador: " + cambio.getString("operador"));
+                                System.out.println("Campo modificado: " + cambio.getString("campo"));
+                                System.out.println("Valor anterior: " +  anterior.toString());
+                                System.out.println("Valor final: " +  nuevo.toString());
+                            }
+                        } else {
+                            System.out.println("El producto no tiene cambios registrados.");
                         }
 
                         break;
@@ -440,6 +451,8 @@ public class Main {
                             } else {
                                 System.out.println("El usuario con ID " + usuarioPago.getId() + " no tiene pagos registrados.");
                             }
+                        } else {
+                            System.out.println("ID de usuario no encontrado.");
                         }
 
                         break;
@@ -538,6 +551,7 @@ public class Main {
                         String idProductoAgregar = sc.nextLine();
 
                         if(ObjectId.isValid(idProductoAgregar)) {
+                            System.out.println("Producto: " + productoCatalogoDAO.getProductoById(idProductoAgregar).getInteger("nombre"));
                             System.out.println("Cantidad: ");
                             int cantidadAgregar = sc.nextInt();
                             sc.nextLine(); //Limpia el buffer
@@ -547,6 +561,7 @@ public class Main {
                                     carritoManager.snapshotCarrito(currentUser.getId(), carrito);
                                     carrito.agregarItem(idProductoAgregar, cantidadAgregar);
                                     carritoManager.guardarCarrito(currentUser.getId(), carrito);
+                                    System.out.println("Producto agregado al carrito con éxito!");
                                 } else {
                                     System.out.println("No hay suficiente stock disponible");
                                 }
@@ -609,6 +624,7 @@ public class Main {
                             String idProductoCantidad = sc.nextLine();
 
                             if (carrito.getCarrito().containsKey(idProductoCantidad)) {
+                                System.out.println("Producto: " + productoCatalogoDAO.getProductoById(idProductoCantidad).getInteger("nombre"));
                                 System.out.println("Cantidad (ingrese 0 si quiere eliminarlo): ");
                                 int cantidadEditar = sc.nextInt();
                                 sc.nextLine(); //Limpia el buffer
@@ -622,6 +638,7 @@ public class Main {
                                     carritoManager.snapshotCarrito(currentUser.getId(), carrito);
                                     carrito.modificarCantidad(idProductoCantidad, cantidadEditar);
                                     carritoManager.guardarCarrito(currentUser.getId(), carrito);
+                                    System.out.println("Producto editado con éxito!");
                                 } else {
                                     if (cantidadEditar < 0) {
                                         System.out.println("Ingrese un valor correcto.");
@@ -671,6 +688,7 @@ public class Main {
                                 carritoManager.eliminarCarrito(currentUser.getId());
                                 //Vacia el snapshot del carrito
                                 carritoManager.eliminarSnapshots(currentUser.getId());
+                                System.out.println("Pedido creado con éxito!");
                             }
                         } else {
                             System.out.println("El carrito está vacío.");
@@ -759,14 +777,17 @@ public class Main {
                                     String operador = sc.nextLine();
 
                                     pedidoManager.registrarPago(facturasSelecionadas, medio, operador, currentUser);
+                                    System.out.println("Factura pagada con éxito!");
                                 } else {
-                                    System.out.println("Ningun ID de factura valido fue aportado");
+                                    System.out.println("Ningun ID de factura valido fue aportado.");
                                 }
                             } else {
-                                System.out.println("Usuario no debe facturas pendientes");
+                                System.out.println("Usuario no debe facturas pendientes.");
                             }
 
 
+                        } else {
+                            System.out.println("El usuario no tiene facturas generadas.");
                         }
 
                         break;
