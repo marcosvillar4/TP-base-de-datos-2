@@ -2,10 +2,11 @@ package org.example.clases.Usuario;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 
 import java.time.LocalDateTime;
 import java.time.Duration;
-
 
 @Entity
 public class Sesion {
@@ -16,11 +17,11 @@ public class Sesion {
     private long duracionMin;
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    public Sesion(LocalDateTime inicio, int id) {
+    public Sesion(LocalDateTime inicio) {
         this.inicio = inicio;
-        this.id = id;
     }
 
     public Sesion() {

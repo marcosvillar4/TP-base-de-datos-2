@@ -36,23 +36,6 @@ public class ProductoCatalogoDAO {
         return coleccion.find().into(new ArrayList<>());
     }
 
-    //Actualiza el precio de un producto en base a su id y almacena el cambio en el historial
-    public void actualizarPrecio(String id, double nuevoPrecio, String operador){
-        Document prod = coleccion.find(eq("_id",  new ObjectId(id))).first();
-
-        if(prod == null) return;
-
-        double precioViejo =  prod.getDouble("precio");
-
-        coleccion.updateOne(eq("_id", new ObjectId(id)),
-                combine(set ("precio", nuevoPrecio),
-                        push("historialCambios", new Document("campo", "precio")
-                                .append("valorAnterior", precioViejo)
-                                .append("valorNuevo", nuevoPrecio)
-                                .append("operador", operador)
-                                .append("fecha", LocalDateTime.now().toString()))));
-    }
-
     //Elimina el producto de la base
     public void eliminarProducto(String idProductoEliminar) {
         DeleteResult check = coleccion.deleteOne(eq("_id", new ObjectId(idProductoEliminar)));

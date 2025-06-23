@@ -44,25 +44,23 @@ public class ProductoCatalogoService {
         public void actualizarFoto(String id, String nuevaFoto, String operador) {
             Document prod = getProducto(id);
             if(prod == null || nuevaFoto == null || nuevaFoto.isBlank()) return;
-            String viejo = prod.getString("foto");
-            actualizarCampo(id, "foto", nuevaFoto, viejo, operador);
+            String viejo = prod.getString("multimedia");
+            actualizarCampo(id, "multimedia", nuevaFoto, viejo, operador);
         }
 
         public void actualizarComentarios(String id, String nuevoComentario, String operador){
             Document prod = getProducto(id);
             if(prod == null || nuevoComentario == null || nuevoComentario.isBlank()) return;
-            String viejo = prod.getString("comentario");
-            actualizarCampo(id, "comentario", nuevoComentario, viejo, operador);
+            String viejo = prod.getString("comentarios");
+            actualizarCampo(id, "comentarios", nuevoComentario, viejo, operador);
         }
 
     public void actualizarCantidad(String id, int nuevaCantidad, String operador){
         Document prod = getProducto(id);
         if(prod != null && nuevaCantidad != 0 && !operador.isBlank()){
-            int viejo = prod.getInteger("cantidad");
+            int viejo = Integer.parseInt(prod.getString("cantidad"));
             actualizarCampo(id, "cantidad", String.valueOf(nuevaCantidad), viejo, operador);
         }
-
-
     }
 
         public List<Document> getHistorialCambios(String idProd){

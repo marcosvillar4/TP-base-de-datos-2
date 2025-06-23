@@ -24,7 +24,7 @@ public class HistorialCambiosService {
             case "nombre" -> "Se actualizó el nombre";
             case "precio" -> "Se actualizó el precio";
             case "cantidad" -> "Se actualizó la cantidad";
-            case "foto" -> "Se actualizó la foto";
+            case "multimedia" -> "Se actualizó el archivo multimedia";
             case "comentarios" -> "Se actualizaron los comentarios";
             default -> "Se actualizó el campo: " + campo;
         };
@@ -40,13 +40,12 @@ public class HistorialCambiosService {
     }
 
     public List<Document> obtenerHistorialDelProducto(String idProducto){
-        List<Document> historial = new ArrayList<>();
-        try(MongoCursor<Document> cursor = coleccion.find(eq("_id", new ObjectId(idProducto))).iterator()){
-            while(cursor.hasNext()){
-                historial.add(cursor.next());
-            }
-        }
+        Document producto = coleccion.find(eq("_id", new ObjectId(idProducto))).first();
+        if(producto == null) return Collections.emptyList();
+
+        List<Document> historial = (List<Document>) producto.get("historialCambios");
+        if(historial == null) return Collections.emptyList();
+
         return historial;
     }
-
 }

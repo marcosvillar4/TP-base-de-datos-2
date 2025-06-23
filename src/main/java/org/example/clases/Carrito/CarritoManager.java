@@ -2,14 +2,19 @@ package org.example.clases.Carrito;
 
 import com.google.gson.Gson;
 import redis.clients.jedis.Jedis;
+import java.net.URI;
 
 public class CarritoManager {
     private static final String PREFIX = "carrito:";
     private final Jedis redis;
     private final Gson gson = new Gson();
 
-    public CarritoManager(String host, int port){
+    /*public CarritoManager(String host, int port){
         this.redis = new Jedis(host, port);
+    }*/
+
+    public CarritoManager(String uri){
+        this.redis = new Jedis(URI.create(uri));
     }
 
     public Carrito obtenerCarrito(String idUsuario){

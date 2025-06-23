@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import org.example.clases.Enums.CategoriaUsuario;
+import jakarta.persistence.CascadeType;
 import org.example.clases.Factura.Factura;
 import org.example.clases.Factura.Pago;
 import org.example.clases.Pedido.Pedido;
@@ -29,7 +30,7 @@ public class Usuario implements Serializable {
     @OneToMany
     private List<Factura> facturas;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Sesion> sesiones = new ArrayList<>();
 
     @OneToMany
@@ -102,27 +103,20 @@ public class Usuario implements Serializable {
     }
 
     public void actualizarCategoria(){
-        Map<LocalDate, Long> minutosPorDia = new HashMap<>();
+        long totalMinutos = 0;
 
         for(Sesion s : sesiones){
             if(s.getDuracionEnMinutos() > 0){
-                LocalDate dia = s.getInicio().toLocalDate();
-                minutosPorDia.put(dia, minutosPorDia.getOrDefault(dia, 0L) + s.getDuracionEnMinutos());
+                totalMinutos += s.getDuracionEnMinutos();
             }
         }
 
-        //Encuentra el ultimo dia (mas reciente) en el map minutosPorDia
-        Optional<LocalDate> ultimoDia = minutosPorDia.keySet().stream().max(Comparator.naturalOrder()); //Optional porque puede que no haya fechas
-
-        if(ultimoDia.isPresent()){
-            long minutos = minutosPorDia.get(ultimoDia.get());
-            if(minutos > 240){
-                categoria = CategoriaUsuario.TOP;
-            } else if(minutos >=120){
-                categoria = CategoriaUsuario.MEDIUM;
-            } else{
-                categoria = CategoriaUsuario.LOW;
-            }
+        if(totalMinutos > 14){ //240
+            categoria = CategoriaUsuario.TOP;
+        }else if(totalMinutos >= 11) { //120
+            categoria = CategoriaUsuario.MEDIUM;
+        }else{
+            categoria = CategoriaUsuario.LOW;
         }
     }
 

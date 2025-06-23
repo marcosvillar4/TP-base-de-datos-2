@@ -18,6 +18,8 @@ import org.example.clases.Pedido.PedidoManager;
 import org.example.clases.Producto.Producto;
 import org.example.clases.Usuario.Sesion;
 import org.example.clases.Usuario.Usuario;
+
+import java.sql.SQLOutput;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.logging.Level;
@@ -46,7 +48,8 @@ public class Main {
 
         Usuario currentUser = null;
 
-        CarritoManager carritoManager = new CarritoManager("192.168.1.25", 6379);
+        //CarritoManager carritoManager = new CarritoManager("192.168.1.25", 6379);
+        CarritoManager carritoManager = new CarritoManager("rediss://default:AYjpAAIjcDE3ZGU4Y2U4NDc2ZTI0NGRjOTYwZTI4MTNjMmQzMmY4ZHAxMA@flowing-fowl-35049.upstash.io:6379");
         PedidoManager pedidoManager = new PedidoManager(usrEntityManager, carritoManager);
 
         ProductoCatalogoDAO productoCatalogoDAO = new ProductoCatalogoDAO(MongoManager.getDatabase());
@@ -71,11 +74,9 @@ public class Main {
                 case 1:
 
                     System.out.println("Nombre de Usuario: ");
-                    usr = sc.next();
-                    sc.nextLine(); //Limpia el buffer
+                    usr = sc.nextLine();
                     System.out.println("Contraseña: ");
-                    passwd = sc.next();
-                    sc.nextLine(); //Limpia el buffer
+                    passwd = sc.nextLine();
 
                     TypedQuery<Usuario> usrCreationQuery = usrEntityManager.createQuery("SELECT u FROM Usuario u WHERE u.nombre =:usr", Usuario.class);
                     usuarios = usrCreationQuery.setParameter("usr",usr).getResultList();
@@ -97,13 +98,13 @@ public class Main {
                         usrEntityManager.getTransaction().begin();
 
                         System.out.println(LocalDateTime.now());
-                        Sesion sesion = new Sesion(LocalDateTime.now(), currentUser.getSesiones().size());
+                        Sesion sesion = new Sesion(LocalDateTime.now());
                         currentUser.getSesiones().add(sesion);
 
 
                         //NUEVO: Guardar (mergear) los cambios de sesiones del usuario en la base de datos
 
-                        usrEntityManager.persist(sesion);
+                        //usrEntityManager.persist(sesion);
                         usrEntityManager.persist(currentUser);
                         usrEntityManager.getTransaction().commit();
                     }
@@ -113,14 +114,15 @@ public class Main {
 
                 case 2:
 
-                    System.out.println("Ingresa el nombre del nuevo usuario" + System.lineSeparator());
+                    System.out.println("Ingresa el nombre del nuevo usuario");
 
                     usr = sc.nextLine();
                     System.out.println(usr);
                     System.out.println("Ingresa la contraseña del nuevo usuario");
                     passwd = sc.nextLine();
                     System.out.println("Ingresa el DNI del nuevo usuario");
-                    int dni = Integer.parseInt(sc.nextLine());
+                    int dni = sc.nextInt();
+                    sc.nextLine(); //Limpia el buffer
                     System.out.println("Ingresa la direccion del nuevo usuario");
                     String direccion = sc.nextLine();
 
@@ -167,7 +169,7 @@ public class Main {
                         if (currentUser.getSesiones() == null){
                             currentUser.setSesiones(new LinkedList<>());
                         }
-                        currentUser.getSesiones().add(new Sesion(LocalDateTime.now(), currentUser.getSesiones().size()));
+                        currentUser.getSesiones().add(new Sesion(LocalDateTime.now()));
 
                         usrEntityManager.persist(u);
                         usrEntityManager.getTransaction().commit();
@@ -193,7 +195,7 @@ public class Main {
             while (opcion != 9) {
                 System.out.println("Elija una opción:");
                 System.out.println("1. Ver datos de usuario");
-                System.out.println("2. Agregar producto"); //Falta
+                System.out.println("2. Agregar producto");
                 System.out.println("3. Eliminar producto");
                 System.out.println("4. Editar producto");
                 System.out.println("5. Ver el historial de cambios de un producto");
@@ -214,16 +216,16 @@ public class Main {
                         sc.nextLine(); //Limpia el buffer
 
                         TypedQuery<Usuario> usrFindQuery = usrEntityManager.createQuery("SELECT u FROM Usuario u WHERE u.id =:idUsuario", Usuario.class);
-                        List<Usuario> usuarioBuscar = usrFindQuery.setParameter("idUsuario",idUsuarioBuscar).getResultList();
+                        List<Usuario> usuarioBuscar = usrFindQuery.setParameter("idUsuario", String.valueOf(idUsuarioBuscar)).getResultList();
 
                         if (!usuarioBuscar.isEmpty()){
                             for (Usuario usuario : usuarioBuscar) {
-                                System.out.println("ID del usuario: " + usuario.getId() + ".");
-                                System.out.println("Nombre del usuario: " + usuario.getNombre() + ".");
-                                System.out.println("Clave del usuario: " + usuario.getPasswd() + ".");
-                                System.out.println("DNI del usuario: " + usuario.getDni() + ".");
-                                System.out.println("Dirección del usuario: " + usuario.getDireccion() + ".");
-                                System.out.println("Tipo de usuario: " + usuario.getCategoria() + ".");
+                                System.out.println("ID del usuario: " + usuario.getId());
+                                System.out.println("Nombre del usuario: " + usuario.getNombre());
+                                System.out.println("Clave del usuario: " + usuario.getPasswd());
+                                System.out.println("DNI del usuario: " + usuario.getDni());
+                                System.out.println("Dirección del usuario: " + usuario.getDireccion());
+                                System.out.println("Tipo de usuario: " + usuario.getCategoria());
                             }
                         } else {
                             System.out.println("ID de usuario no encontrado.");
@@ -250,9 +252,6 @@ public class Main {
 
                         Producto producto = new Producto(nombre, descripcion, precio, cantidad, comentario);
                         productoCatalogoDAO.insertarProducto(producto, url);
-
-
-
                         break;
 
                     case 3:
@@ -340,12 +339,15 @@ public class Main {
                         List<Document> historial = productoCatalogoService.getHistorialCambios(idProducto);
 
                         for(Document cambio : historial){
+                            Object anterior = cambio.get("valorAnterior");
+                            Object nuevo = cambio.get("valorNuevo");
+
                             System.out.println("_____________________________________");
-                            System.out.println("Fecha: " + cambio.getDate("fecha"));
+                            System.out.println("Fecha: " + cambio.getString("fecha"));
                             System.out.println("Operador: " + cambio.getString("operador"));
                             System.out.println("Campo modificado: " + cambio.getString("campo"));
-                            System.out.println("Valor anterior: " +  cambio.getDouble("valorAnterior"));
-                            System.out.println("Valor final: " +  cambio.getDouble("valorNuevo"));
+                            System.out.println("Valor anterior: " +  anterior.toString());
+                            System.out.println("Valor final: " +  nuevo.toString());
                         }
 
                         break;
@@ -395,12 +397,31 @@ public class Main {
                         String idUsuarioPagos = sc.nextLine();
 
                         TypedQuery<Usuario> PagosFindQuery = usrEntityManager.createQuery("SELECT u FROM Usuario u WHERE u.id =:idUsuario", Usuario.class);
-                        List<Usuario> usuarioPagos = PagosFindQuery.setParameter("idUsuario",idUsuarioPagos).getResultList();
+                        List<Usuario> usuarioPagos = PagosFindQuery.setParameter("idUsuario", idUsuarioPagos).getResultList();
 
-                        if (!usuarioPagos.isEmpty()){
-                            pedidoManager.listarPagos(idUsuarioPagos);
-                        } else {
-                            System.out.println("ID del usuario no encontrado.");
+                        if (!usuarioPagos.isEmpty()) {
+                            Usuario usuarioPago = usuarioPagos.get(0);
+                            List<Pago> pagosListar = pedidoManager.listarPagos(idUsuarioPagos);
+
+                            if (!pagosListar.isEmpty()) {
+                                System.out.println("__________________________________");
+                                System.out.println("PAGOS DE: " + usuarioPago.getNombre());
+                                System.out.println("DNI: " + usuarioPago.getDni());
+
+                                for (Pago pago : pagosListar) {
+                                    System.out.println("---------------------");
+                                    System.out.println("ID PAGO: " + pago.getId());
+                                    System.out.println("Fecha: " + pago.getFecha());
+                                    System.out.println("Monto: $" + pago.getMonto());
+                                    System.out.println("Medio: " + pago.getMedioPago());
+                                    System.out.println("Operador: " + (pago.getOperador() != null ? pago.getOperador() : "N/A"));
+                                    System.out.print("Facturas asociadas (IDs): ");
+                                    pago.getFacturasAplicadas().forEach(f -> System.out.print(f.getId() + " "));
+                                    System.out.println();
+                                }
+                            } else {
+                                System.out.println("El usuario con ID " + usuarioPago.getId() + " no tiene pagos registrados.");
+                            }
                         }
 
                         break;
@@ -417,6 +438,8 @@ public class Main {
                             System.out.println("Descripcion: " + document.get("descripcion").toString());
                             System.out.println("Precio: " + document.get("precio"));
                             System.out.println("Stock: " + document.get("cantidad"));
+                            System.out.println("Multimedia: " + document.get("multimedia"));
+                            System.out.println("Comentarios: " + document.get("comentarios"));
                         }
                         break;
 
@@ -468,7 +491,7 @@ public class Main {
                 System.out.println("9. Pagar pedidos");
                 System.out.println("10. Ver facturas del usuario");
                 System.out.println("11. Ver historial de pagos");
-                System.out.println("12. Salir");
+                System.out.println("12. Cerrar sesión");
 
                 opcion2 = sc.nextInt();
                 sc.nextLine(); //Limpia el buffer
@@ -486,6 +509,8 @@ public class Main {
                             System.out.println("Descripcion: " + document.get("descripcion").toString());
                             System.out.println("Precio: " + document.get("precio"));
                             System.out.println("Stock: " + document.get("cantidad"));
+                            System.out.println("Multimedia: " + document.get("multimedia"));
+                            System.out.println("Comentarios: " + document.get("comentarios"));
                         }
                         break;
 
@@ -518,18 +543,13 @@ public class Main {
                             String idProductoEliminar = sc.nextLine();
 
                             if (carrito.getCarrito().containsKey(idProductoEliminar)) {
-                                System.out.println("Cantidad: ");
-                                int cantidadEliminar = sc.nextInt();
-                                sc.nextLine(); //Limpia el buffer
-                                if (carrito.getCarrito().get(idProductoEliminar) >= cantidadEliminar) {
-                                    carrito.eliminarItem(idProductoEliminar, cantidadEliminar);
+                                carrito.eliminarItem(idProductoEliminar);
 
-                                    //Guarda un snapshot del carrito para deshacer y despues lo guarda
-                                    carritoManager.snapshotCarrito(currentUser.getId(), carrito);
-                                    carritoManager.guardarCarrito(currentUser.getId(), carrito);
-                                } else {
-                                    System.out.println("Imposible eliminar mas productos de los que hay en el carrito");
-                                }
+                                // Guarda snapshot del carrito para deshacer y guarda el carrito
+                                carritoManager.snapshotCarrito(currentUser.getId(), carrito);
+                                carritoManager.guardarCarrito(currentUser.getId(), carrito);
+
+                                System.out.println("Producto eliminado del carrito.");
                             } else {
                                 System.out.println("Producto no encontrado en el carrito");
                             }
@@ -569,7 +589,11 @@ public class Main {
                                 System.out.println("Cantidad (ingrese 0 si quiere eliminarlo): ");
                                 int cantidadEditar = sc.nextInt();
                                 sc.nextLine(); //Limpia el buffer
-                                if (carrito.getCarrito().get(idProductoCantidad) >= cantidadEditar && cantidadEditar >= 0) {
+
+                                Document productoDoc = productoCatalogoDAO.getProductoById(idProductoCantidad);
+                                int stockDisponible = Integer.parseInt(productoDoc.get("cantidad").toString());
+
+                                if (stockDisponible >= cantidadEditar && cantidadEditar >= 0) {
                                     carrito.modificarCantidad(idProductoCantidad, cantidadEditar);
 
                                     //Guarda snapshot para deshacer y guarda el carrito
@@ -579,7 +603,7 @@ public class Main {
                                     if (cantidadEditar < 0) {
                                         System.out.println("Ingrese un valor correcto.");
                                     } else {
-                                        System.out.println("Imposible agregar mas productos de los que hay en el carrito.");
+                                        System.out.println("Imposible agregar mas productos de los que hay en stock.");
                                     }
                                 }
                             } else {
@@ -622,6 +646,8 @@ public class Main {
                             carritoManager.eliminarCarrito(currentUser.getId());
                             //Vacia el buffer del snapshot del carrito
                             carritoManager.snapshotCarrito(currentUser.getId(), null);
+                        } else {
+                            System.out.println("El carrito está vacío.");
                         }
                         break;
 

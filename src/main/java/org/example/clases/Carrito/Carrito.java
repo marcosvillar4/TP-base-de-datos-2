@@ -35,28 +35,10 @@ public class Carrito {
         } else {
             carrito.put(producto, cantidad);
         }
-
-        /*for(ItemCarrito item : carrito){
-            if(item.getIdProducto().equals(producto)){
-                item.setCantidad(item.getCantidad() + cantidad);
-                return;
-            }
-        }
-
-        ItemCarrito nuevo = new ItemCarrito(producto, cantidad);
-        nuevo.setId(carrito.size() + 1);
-        carrito.add(nuevo);*/
     }
 
-    public void eliminarItem(String idProducto, int cantidad){
-
-        if (carrito.containsKey(idProducto)){
-            if (cantidad <= carrito.get(idProducto)){
-                carrito.replace(idProducto, carrito.get(idProducto) - cantidad);
-            }
-        }
-
-        //carrito.removeIf(item -> item.getIdProducto().equals(idProducto));
+    public void eliminarItem(String idProducto){
+        carrito.remove(idProducto);
     }
 
     public void modificarCantidad(String idProducto, int cantidad){
