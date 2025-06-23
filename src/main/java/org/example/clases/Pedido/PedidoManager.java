@@ -23,20 +23,6 @@ public class PedidoManager {
         this.carritoManager = carritoManager;
     }
 
-
-        // Lista facturas pendientes del usuario
-    public List<Factura> buscarFacturasPendientes(int idUsuario) {
-        String jpql = """
-                SELECT f FROM Factura f
-                WHERE f.pedido.usuario.id = :idUsuario AND f.estado = :estado
-                """;
-
-        return em.createQuery(jpql, Factura.class)
-                .setParameter("idUsuario", idUsuario)
-                .setParameter("estado", EstadoFactura.PENDIENTE)
-                .getResultList();
-    }
-
     // Listado de pagos realizados por un usuario
     public List<Pago> listarPagos(String idUsuario) {
 
@@ -70,7 +56,7 @@ public class PedidoManager {
 
 
         Pedido pedido = new Pedido();
-        pedido.setUsuario(usuario);
+
         pedido.setCarrito(carrito);
         pedido.setFecha(LocalDateTime.now());
 
@@ -111,6 +97,7 @@ public class PedidoManager {
 
         em.getTransaction().begin();
         em.persist(factura);
+        em.persist(pedido);
         em.getTransaction().commit();
 
         return factura;
