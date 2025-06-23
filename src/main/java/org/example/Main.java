@@ -338,36 +338,34 @@ public class Main {
 
                         String idUsuarioFacturas = sc.nextLine();
 
-                        /*TypedQuery<Usuario> FacturasFindQuery = usrEntityManager.createQuery("SELECT u FROM Usuario u WHERE u.id =:idUsuario", Usuario.class);
-                        List<Usuario> usuarioFactura = FacturasFindQuery.setParameter("idUsuario",idUsuarioFacturas).getResultList();
+                        TypedQuery<Usuario> FacturasFindQuery = usrEntityManager.createQuery("SELECT u FROM Usuario u WHERE u.id =:idUsuario", Usuario.class);
+                        List<Usuario> usuarioFactura = FacturasFindQuery.setParameter("idUsuario", idUsuarioFacturas).getResultList();
 
-                        if (!usuarioFactura.isEmpty()){
-                            pedidoManager.listarFacturas(idUsuarioFacturas);
-                        } else {
-                            System.out.println("ID del usuario no encontrado.");
-                        }*/
+                        if (!usuarioFactura.isEmpty()) {
+                            Usuario usuarioFact = usuarioFactura.get(0);
+                            List<Factura> facturasListar = pedidoManager.listarFacturas(idUsuarioFacturas);
 
-                        List<Factura> facturasListar = pedidoManager.listarFacturas(idUsuarioFacturas);
+                            if (!facturasListar.isEmpty()) {
+                                System.out.println("_________________________________");
+                                System.out.println("FACTURAS DE: " + usuarioFact.getNombre());
+                                System.out.println("DNI: " + usuarioFact.getDni());
 
-                        if (!facturasListar.isEmpty()) {
-                            System.out.println("_________________________________");
-                            System.out.println("FACTURAS DE: " + currentUser.getNombre());
-                            System.out.println("DNI: " +  currentUser.getDni());
-
-                            for (Factura f : facturasListar) {
-                                System.out.println("---------------------");
-                                System.out.println("ID FACTURA: " + f.getId());
-                                System.out.println("Fecha: " + f.getPedido().getFecha());
-                                System.out.println("Subtotal: $" + f.getSubtotal());
-                                System.out.println("Impuestos: $" + f.getImpuestos());
-                                System.out.println("Total: $" + f.getTotal());
-                                System.out.println("Estado: " + f.getEstado());
-                                System.out.println("ID Pedido origen: " + f.getPedido().getIdPedido());
+                                for (Factura f : facturasListar) {
+                                    System.out.println("---------------------");
+                                    System.out.println("ID FACTURA: " + f.getId());
+                                    System.out.println("Fecha: " + f.getPedido().getFecha());
+                                    System.out.println("Subtotal: $" + f.getSubtotal());
+                                    System.out.println("Impuestos: $" + f.getImpuestos());
+                                    System.out.println("Total: $" + f.getTotal());
+                                    System.out.println("Estado: " + f.getEstado());
+                                    System.out.println("ID Pedido origen: " + f.getPedido().getIdPedido());
+                                }
+                            } else {
+                                System.out.println("El usuario con ID " + usuarioFact.getId() + " no tiene facturas.");
                             }
-                        } else{
-                            System.out.println("El usuario con ID " + currentUser.getId() + " no tiene facturas.");
+                        } else {
+                            System.out.println("ID de usuario no encontrado.");
                         }
-
                         break;
 
 
