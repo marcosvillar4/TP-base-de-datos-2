@@ -21,6 +21,7 @@ public class MongoManager {
             client = MongoClients.create(URI);
             database = client.getDatabase(DB_NAME);
             logger.info("Conectado exitosamente a la base de datos '{}'", DB_NAME);
+
         }
         return database;
     }

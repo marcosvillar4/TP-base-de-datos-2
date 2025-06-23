@@ -20,12 +20,21 @@ import org.example.clases.Usuario.*;
 import org.example.clases.Pedido.Pedido;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.bson.Document;
 
 
+
 public class Main {
     public static void main(String[] args) {
+
+
+
+        Logger mongoLogger = Logger.getLogger( "org.mongodb.driver" );
+        mongoLogger.setLevel(Level.SEVERE);
+
         Scanner sc = new Scanner(System.in);
 
         int opcion = 0;
@@ -89,12 +98,18 @@ public class Main {
                         if (currentUser.getSesiones() == null){
                             currentUser.setSesiones(new LinkedList<>());
                         }
-                        currentUser.getSesiones().add(new Sesion(LocalDateTime.now(), currentUser.getSesiones().size()));
+
+                        usrEntityManager.getTransaction().begin();
+
+                        System.out.println(LocalDateTime.now());
+                        Sesion sesion = new Sesion(LocalDateTime.now(), currentUser.getSesiones().size());
+                        currentUser.getSesiones().add(sesion);
 
 
                         //NUEVO: Guardar (mergear) los cambios de sesiones del usuario en la base de datos
-                        usrEntityManager.getTransaction().begin();
-                        usrEntityManager.merge(currentUser);
+
+                        usrEntityManager.persist(sesion);
+                        usrEntityManager.persist(currentUser);
                         usrEntityManager.getTransaction().commit();
                     }
                     break;
@@ -394,7 +409,8 @@ public class Main {
                         break;
                 }
             }
-        } else {
+        }
+        else {
 
             int opcion2 = 0;
 
@@ -406,7 +422,7 @@ public class Main {
 
             while (opcion2 != 12) {
 
-
+                System.out.println("__________________");
                 System.out.println("Elija una opcion:");
                 System.out.println("__________________");
                 System.out.println("1. Ver catálogo de productos");
@@ -734,7 +750,7 @@ public class Main {
                             }
                         }
                         usrEntityManager.getTransaction().begin();
-                        usrEntityManager.merge(currentUser);
+                        usrEntityManager.persist(currentUser);
                         usrEntityManager.getTransaction().commit();
                         break;
                 }
