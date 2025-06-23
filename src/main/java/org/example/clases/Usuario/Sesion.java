@@ -13,7 +13,7 @@ public class Sesion {
 
     private LocalDateTime inicio;
     private LocalDateTime fin;
-    private Duration duracion;
+    private long duracionMin;
 
     @Id
     private int id;
@@ -29,11 +29,11 @@ public class Sesion {
 
     public void cerrarSesion(){
         this.fin = LocalDateTime.now();
-        this.duracion = Duration.between(this.inicio, this.fin);
+        this.duracionMin = Duration.between(this.inicio, this.fin).toMinutes();
     }
 
     public long getDuracionEnMinutos(){
-        return duracion != null ? this.duracion.toMinutes() : 0;
+        return duracionMin;
     }
 
     //Getters y setters
@@ -54,13 +54,5 @@ public class Sesion {
 
     public void setFin(LocalDateTime fin) {
         this.fin = fin;
-    }
-
-    public Duration getDuracion() {
-        return duracion;
-    }
-
-    public void setDuracion(Duration duracion) {
-        this.duracion = duracion;
     }
 }
