@@ -24,27 +24,7 @@ public class PedidoManager {
     }
 
 
-    // Cierra el proceso de compra: genera pedido, factura y registra el pago (incluyendo otras facturas)
-    /*
-    public void cerrarPedidoYRegistrarPago(int idUsuario, Usuario usuario, MedioPago medioPago, String operador) {
-        Pedido pedido = generarYGuardarPedido(idUsuario, usuario);
-        if (pedido == null) {
-            System.out.println("No se generó el pedido");
-            return;
-        }
-
-        Factura facturaNueva = facturarPedido(pedido);
-        List<Factura> facturasSeleccionadas = obtenerFacturasSeleccionadas(idUsuario);
-        List<Factura> todas = new ArrayList<>();
-        todas.add(facturaNueva);
-        todas.addAll(facturasSeleccionadas);
-
-        registrarPago(todas, medioPago, operador);
-        System.out.println("Pago registrado con éxito.");
-    }
-    */
-
-    // Lista facturas pendientes del usuario
+        // Lista facturas pendientes del usuario
     public List<Factura> buscarFacturasPendientes(int idUsuario) {
         String jpql = """
                 SELECT f FROM Factura f
@@ -61,10 +41,9 @@ public class PedidoManager {
     public List<Pago> listarPagos(String idUsuario) {
 
         String jpql = """
-                SELECT DISTINCT p FROM Pago p
-                JOIN p.facturasAplicadas f
-                JOIN f.pedido ped
-                WHERE ped.usuario.id = :idUsuario
+                SELECT DISTINCT p FROM Usuario u
+                JOIN u.pagos p
+                WHERE u.id = :idUsuario
                 """;
 
         return em.createQuery(jpql, Pago.class)
@@ -142,6 +121,7 @@ public class PedidoManager {
         double montoTotal = facturas.stream().mapToDouble(Factura::getTotal).sum();
 
         Pago pago = new Pago();
+        pago.setId(String.valueOf(currentUser.getPagos().size()+1));
         pago.setFecha(LocalDateTime.now());
         pago.setMonto(montoTotal);
         pago.setMedioPago(medioPago);
@@ -151,8 +131,7 @@ public class PedidoManager {
 
         for (Factura f : facturas) {
             f.setEstado(EstadoFactura.PAGADA);
-            //pago.getFacturasAplicadas().add(f);
-            //em.persist(f);
+
 
         }
         //em.persist(pago.getFacturasAplicadas());
@@ -166,34 +145,4 @@ public class PedidoManager {
     }
 
     // Pide al usuario qué facturas pendientes desea pagar
-    public List<Factura> obtenerFacturasSeleccionadas(int idUsuario) {
-        List<Factura> pendientes = buscarFacturasPendientes(idUsuario);
-        if (pendientes.isEmpty()) {
-            System.out.println("No hay facturas pendientes.");
-            return Collections.emptyList();
-        }
-
-        System.out.println("Facturas pendientes:");
-        for (Factura f : pendientes) {
-            System.out.println("ID: " + f.getId() + " | Total: $" + f.getTotal());
-        }
-
-        Scanner sc = new Scanner(System.in);
-        System.out.print("Ingrese los IDs de las facturas a pagar (separados por coma): ");
-        String input = sc.nextLine();
-
-        String[] idsFacturas = input.split(",");
-        List<Integer> idsSeleccionados = new ArrayList<>();
-        for (String id : idsFacturas) {
-            try {
-                idsSeleccionados.add(Integer.parseInt(id.trim()));
-            } catch (NumberFormatException e) {
-                System.out.println("ID inválido: " + id);
-            }
-        }
-
-        return pendientes.stream()
-                .filter(f -> idsSeleccionados.contains(f.getId()))
-                .toList();
-    }
 }

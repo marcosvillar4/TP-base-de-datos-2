@@ -1,11 +1,13 @@
 package org.example;
 
+import com.objectdb.o.EST;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import jakarta.persistence.TypedQuery;
 import org.example.clases.Carrito.Carrito;
 import org.example.clases.Carrito.CarritoManager;
+import org.example.clases.Enums.EstadoFactura;
 import org.example.clases.Enums.MedioPago;
 import org.example.clases.Factura.Factura;
 import org.example.clases.Factura.Pago;
@@ -402,7 +404,7 @@ public class Main {
                 carrito = new Carrito();
             }
 
-            while (opcion2 != 10) {
+            while (opcion2 != 12) {
 
 
                 System.out.println("Elija una opcion:");
@@ -569,6 +571,7 @@ public class Main {
                             System.out.println("Creando pedido...");
                             pedidoManager.generarYGuardarPedido(currentUser.getId(), currentUser);
                             carrito.vaciarCarrito();
+                            carritoManager.eliminarCarrito(currentUser.getId());
                             //Vacia el buffer del snapshot del carrito
                             carritoManager.snapshotCarrito(currentUser.getId(), null);
                         }
@@ -595,7 +598,10 @@ public class Main {
                                 for (String id : ids) {
                                     for (Factura factura : facturas) {
                                         if (Objects.equals(factura.getId(), id)) {
-                                            facturasSelecionadas.add(factura);
+                                            if (factura.getEstado() != EstadoFactura.PAGADA){
+                                                facturasSelecionadas.add(factura);
+                                            }
+
                                         }
                                     }
 
